@@ -1,0 +1,39 @@
+0.  Pneumonoultramicroscopicsilicovolcanoconiosis is, according to the Oxford
+English Dictionary, "a factitious word alleged to mean 'a lung disease caused by
+the inhalation of very fine silica dust, causing inflammation in the lungs'".
+Long version of silicosis. Longest english word ever to appear in English
+language dictionary. (Source: Wikipedia)
+
+1.  getrusage - get resource usage. Returns resource usage as a struct for one
+of the following:
+    - RUSAGE_SELF the calling process. The sum of resources used by all threads
+      in the process.
+    - RUSAGE_CHILDREN all children of the calling process that have terminated
+      and been waited for. Stats will include all resources down the chain.
+    - RUSAGE_THREAD returns resource usage statistics for the calling thread.
+
+2.  There are 16 attributes in a variable of type struct rusage.
+
+3.  Because we are refering to them in 'calculate'.
+
+4.  The for loop is equivalent to - while we can get character from file pointer
+and we are not at the end of file:
+    - if we encounter a alphabetic character or an apostrophe, we append
+      character to the word. If we reach the max length of a word, we skip to
+      the next word
+    - if we encounter a numerical character, we skip the word that contains it
+    - if we have a whole word, we check it's spelling, and print it if its
+      misspelled. Update statistics.
+
+5.  fgetc is more convenient.
+
+6.  Specifying that they are not going to remain constant, perhaps allows for
+some optimizations on compilers part.
+
+7.  TODO
+
+8.  TODO
+
+9.  TODO
+
+10. TODO

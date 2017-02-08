@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome - Blob Blog</title>
+
+    <style type="text/css">
+        html { font-family: sans-serif; line-height: 1.8em;}
+        h1 { font-family: serif; text-align: center; padding-bottom: 20px; }
+        .top {color: #ccc; font-size: 1.0em; position: relative; display:
+inline-block; margin: 0 30px;}
+        .top.options {float: left;}
+        .top.userinfo {float: right;}
+        a { text-decoration: none; color:inherit; }
+        a:hover { color: orange; }
+        input, textarea{ display: block; }
+        #path {visibility: none;}
+    </style>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44893033-1', 'udacity-testapp.appspot.com');
+  ga('send', 'pageview');
+</script>
+
+</head>
+<body>
+
+  <span class="top options">
+    {% if user %}
+    <a href="/wiki/_edit/{{ current_page }}">edit</a> |
+    {% endif %}
+
+    <a href="/wiki/history/{{ current_page }}">history</a>
+  </span>
+
+  <span class="top userinfo">
+    {% if user %}
+      Logged in as {{ user.username }}
+      <a href="/wiki/logout">(Log Out)</a>
+    {% else %}
+      <a href="/wiki/login">Log In</a>
+    {% endif %}
+  </span>
+
+    <div class="content">
+    {% block content %}
+    {% endblock %}
+    </div>
+
+</body>
+</html>

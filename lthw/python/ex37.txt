@@ -1,0 +1,110 @@
+Keywords:
+=========
+
+and - boolean operator
+del - delete something
+from - part of an import statement
+not - negation boolean operator
+while - repeated execution
+as - part of an import statement or used to wrap context manager
+elif - else if, makes your life easier
+global - makes the scope of the thing that follows global
+or - boolean op
+with - context manager keyword (for sandwich code)
+assert - assert sth, otherwise go home
+else - conditional statements, branching thingy
+if - same thing
+pass - "You" "Shall" "Not" pass is null operator, does nothing at all
+yield - for generator functions
+break - break out of the closest loop
+except - for catching exceptions, part of try statement
+import - for importing modules / packageds or whatever these things are called
+print - print something to stdout
+class - define a class object
+exec - executes code from a string? I did learn that compile + exec > exec
+in - keyword for checking whether sth is "in" sth, a comparison operator
+raise - for raising exceptions
+continue - continue to execute the code after this statement
+finally - always run the code indented under this in try statement
+is - comparison operator to test for object identity? magic
+return - return something from within a function
+def - define something
+for - for repeated execution
+lambda - defining functions on the fly (lambda: "is amazing!")
+try - specifies exception handlers for some code, yees handle them exceptions
+
+
+Data Types:
+===========
+
+True - Boolean value, 1 , anything other than False
+False - 0, None, [], {}, ()
+None - there can be only one
+strings - "hi, douchebag! I'm a string!" "WHERE DID CHARACTERS GO??"
+numbers - 1, 2, 3, 4/5, 6/23, 2i, -123, 0, infinity
+floats - 2.320, 25.36, 2.62e-12, 3.25e6
+lists - [], [1, 2, 3], ['i', "am", 'a', "bloody", "list"]
+
+
+String Escape Sequences
+=======================
+
+\\ - backslash
+\' - one whatever that is
+\" - one whatever that is, certainly not a semicolon
+\a - BELL
+\b - BACKSPACE
+\f - FORMFEED
+\n - NEWLINE
+\r - CARRIAGE RETURN <ENTER>
+\t - TAB
+\v - VERTICAL TAB??
+
+String Formats
+==============
+
+%d - digit
+%i - integer
+%o - octal
+%u - unsigned int
+%x - hexadecimal
+%X - HEXADECIMAL
+%e - scientific notation number
+%E - SCIENTIFIC NOTATION aka EXPONENTIAL FORMAT
+%f - floating point
+%F - THE SAME??
+%g - automatic %e or %g, if more than 4 chars behind radix pt
+%c - character
+%r - raw
+%s - string
+%% - escaping the % sign
+
+
+Operators
+=========
+
++ - addition
+- - subtraction
+* - multiplication
+** - exponential
+/ - division, see //
+// - in python 3 afaik this is truncating division operator. / is for floats.
+% - modulo operator
+< - lt
+> - gt
+<= lt or equal
+>= gt or equal
+== - equal
+!= - not equal
+<> - not equal
+() - tuple?
+[] - list
+{} - dictionary
+@ - decorator
+, - seperator??
+: - dunno, definition op?
+. - for accessing object properties or attributes
+= - assignment operator
+; - no idea whats the meaning of it in python
+(anyop)= - shorthand
+

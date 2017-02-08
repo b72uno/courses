@@ -1,0 +1,45 @@
+1. The man saw the woman, who had a telescope.
+   Through his telescope, the man saw the woman.
+
+2. (a) After ten years of being apart, Sisters reunited at the Safeway's
+checkout line. (b) Large hole appears in High Street. City authorities are
+looking into the possible causes. (c) Mayor says bus passengers should be
+wearing seatbelts while in the bus.
+
+3. Any injury to the head should not be ignored.
+
+4. If the building is on fire, do not use the elevators.
+
+5. The rest of this page was intentionally left blank.
+
+6. Everybody knows that FoxNews is awesome. Some titles:
+(1) SUV in crash that left 6 teens dead stolen, owner says.
+(2) Confessions of an airline lost and found agent.
+(3) Obama Loses Latino Voice in the White House.
+
+7. Depends entirely on the context. The valid range and nature of the values of
+the temperature needs to be defined first. If it holds only categorical or
+qualitative values, hot might be perfectly fine. If it is supposed to hold
+quanitative data, value hot is not acceptable.
+
+8. A - Universal; E - existental
+(E) N != p | N = (p1*p2*p3...*pn)+1 ^ p* = prime
+Just brute force for N | (E) x | x % N = 0 ^ x <> N ^ x <> 1
+
+primeset = [2, 3, 5]
+stillprime = true
+while (stillprime)
+    x = product(primeset) + 1
+    for (i = 2; i >= sqrt(x); i++)
+        if i % x == 0
+            stillprime = false
+            break
+return x
+
+FOR FUN:
+
+1. In the series of 5 questions whether to use and or or, the correct answers
+were and, and, and, and, and or, respectively.
+
+2. In the series of 5 questions whether you had to choose between the and and
+or, the correct answers were and, or, and, or and or, respectively.

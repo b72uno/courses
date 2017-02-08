@@ -1,0 +1,21 @@
+List of what I've learned so far
+
+- comments with # and triple quotes
+- string formatting with %r when debugging for raw
+  %s for string %d for digit %f for float, not sure yet whether
+  all c-like formats transfer
+
+- args from sys for unpacking variables passed with argv
+- can use *argv in function to accept arbitrary amount of vars
+
+- import sth from sth as sth
+- you can use os module to maximize cross-platform compatibility
+- sys - module for interacting with interpreter stuff
+- File opening with open(), returns file object
+- File object has methods like read, readline, seek, truncate
+  write, writeline, close.
+- Python has readmodes, just like C (a,w,r, additional modes + for update
+        b for binary and U some fancy unicode newline support stuff I dont get.)
+
+
+

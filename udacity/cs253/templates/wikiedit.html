@@ -1,0 +1,27 @@
+{% extends "wikibase.html" %}
+
+{% block content %}
+
+WIKIEDIT
+
+You are editing page: {{ current_page }}
+
+<form action="" method="POST">
+    <label for="content">
+{% if page %}
+    <textarea id="" name="content" rows="10" cols="30">
+{{ page.content }}
+    </textarea>
+{% else %}
+<textarea id="" name="content" rows="10" cols="30">
+</textarea>
+{% endif %}
+    </label>
+    <input type="submit" value="Save" />
+</form>
+
+
+{% endblock %}
+
+
+

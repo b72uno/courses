@@ -1,0 +1,193 @@
+I dont have a whole week to spend looking at production python
+
+I am visiting and checking out following sites, though. For an hour or so.
+
+ - nvm, downloaded python koans, I'm 290 koans and 36 lessons away
+   from enlightment. Lets try to get enlightened.
+   Start time: 10:00 AM 09/01/2013
+
+   Things I learned:
+       - import this (zen of python)
+
+       - you can swap values in python with just a, b = b, a
+
+       - when comparing dictionaries, order doesnt matter
+
+       - you can make a dict from a sequence of keys x = {}.fromkeys((key1,
+
+           key2), value)
+
+       - there is such a thing as raw string. r"String"
+
+       - "\n" counts as 1 character in len(), r"\n" counts as 2
+
+       - two subsequent strings "strign" "string" gets concatenated. + too.
+
+       - use "string {0} {1}".format(val1, val2) to interpolate vars. an
+
+         interesting example: "The square root of 5 is {0:.{1}f}".format(math.sqrt(5), \ 4)
+
+       - when getting substrings the up to position is included
+
+       - for regex import re, then to use pattern = re.compile('pattern')
+
+       - tuple(string) makes a tuple out of all characters of the string
+
+       - Cthulhu not Cthulu as I always thought
+
+       - wrong # of args is a runtime error not syntax error
+
+       - methods accessed from class scope doesnt require to pass self
+
+       - unrolling args produces not a list, but tuple
+
+       - functions without self passed in are global functions, i.e. you call
+         them without prepending them with self like in self.f(), just f()
+
+       - you can redefine functions but keep a link to them (pointer??), e.g.
+         func() def , pointer = func, then redefine func() def you can still
+         access the old one with pointer(). Old methods are hidden by redef
+
+       - prefixing a method with an underscore implies private scope, but AFAIK
+         there is nothing preventing them from being accessed.
+
+       - when prefixing with double underscores the name gets mangled to avoid
+         clash issues. You can still access it with instance._class__method()
+
+    It's been 2 hours. 84/290 koans and 8/36 lessons learned. Lets hope that
+    I can keep this rate up and difficulty of those koans wont grow expoentially.
+
+        - set() same as tuple will split up string by chars. Is not ordered.
+          You can convert it into a list by sorted() to sort it.
+        - sets have logical operators & | ^ -
+        - RuntimeError, StandardError, Exception, BaseException
+        - RuntimeError is a sublcass of StandardError
+        - filter, map, reduce. Reduce applies a function to items cumulatively
+        - list comprehension is [i for i in this thing]
+        - both blocks and generators use yield keyword, but they behave
+          differently, a lot differently.
+
+    It's 5 PM. Was busy. No further progress made. 
+
+    7 PM. Time to continue. Current status -  122/290 koans and 15/36 lessons.
+
+        # Both list comprehensions and generators can be iterated
+        # though. However, a generator function is only called on the
+        # first iteration. The values are generated on the fly instead
+        # of stored.
+        #
+        # Generators are more memory friendly, but less versatile
+
+    Feeling sleepy as buck. Time for a nap. 30 mins. Lets hope not 5h.
+
+    It's 4:30 AM. Almost 10 hours spent sleeping. Fuck.
+        
+        - generators keeps track of local variables
+
+        - generators have a co-routine, send() method which returns the next
+          value yielded by generator or raises StopIteration if the generator
+          exists without yielding another value. Also throw() and close()
+        - before you communicate with a coroutine you must first call next() or
+          send(None) to advance generators execution to the first yield expr
+        - A yield-expression is like a inverted function call. Still dont get
+          this yet.
+
+        - generators can see if they've been called with a value or not 
+
+        - lambdas can be assigned to variables and called explicitly
+
+    5:50 AM. Halfway there 145/290 18/36. Rock on.
+
+        - Classes have getattr() setattr() and delattr() so you dont have to use
+          assignment operators
+
+        - @ are decorators, not sure how they work yet. You can use them like
+          @decorator.setter then define what to do and object.decorator = value
+          its sort of an abstraction, you still define just like you would
+          normally def whattodo(self, value) under decorator.
+
+        - __str__ and __repr__ the latter not returning a string. It provides a
+          more complete / alternative __str__ version. str(object) for __str__
+          and repr(object) for accessing __repr__
+
+        -  all objects support __str__ and __repr__ like str("HA") == "HA" but
+           repr("HA") == '"HA"'
+
+        -  In python 3 there are new style classes. New style classes inherit
+           from object base class. New style classes have more attributes.
+           18 in comparison to 2 old. New style class have same class as type
+           attribute. Old style they are different. 
+
+        - Python solves sandwich code (constant top and bottom, changing middle
+          part) using Context Managers. Seems like a class with __init__,
+          __enter__ and __exit__ methods. Used with 'with' statement, i.e.
+          with ContextManager(filename) as f: some loop for using f.dosth()
+
+        - Open has its own built in context manager so you can use it the same
+          way: with open(file_name) as file: yada yada
+
+        - Monkey patching?? Seems like modifying a class outside of class
+          definition. Can't monkey patch built-in classes, can subclasses of em.
+
+        - Methods are bound to an object and methods are also bound to a
+          function. Functions have attributes. len(f) or dir(f). Bound methods
+          have different attributes. You can set attributes on methods by
+          accessing inner functions. Functions can have inner functions too. Inner
+          functions are unbound. Bound have im_func and im_self, im_class
+          special read only attributes. 
+
+    7:30 AM 191/290 and 24/36. Time to get to work. Will continue in 3h or so.
+
+    9:20 AM. Can continue with major interruptions due to my day job.
+        
+        - Decorators can modify a function / function output. They are also hard
+          to grasp from those koans alone. I dont get them. ;( yet.
+        
+        - Subclasses can invoke parent behaviour via super() 
+        
+        - Init does not get called automatically. Base init has to be called
+          explicitly. 
+    
+        - Left hand side inheritance seems to be higher priority. Super class
+          methods are higher priority than super super classes. 
+
+        - __mro__[] method resolution order. You can think of super() as
+          next_mro()
+        
+        - There are no real constants in python. Its up to dev to keep them
+          constant and not modify them
+
+        - You can import attributes from classes using 'from' keyword. If you
+          just import module then the prefix module.attribute is needed. If from
+          keyword is used then you can just use attribute.  
+
+        - Import wildcard * cannot be used from within functions or classes
+
+        - Modules hide attributes prefixed by underscore, but they are
+          accessible if you explicitly import them, keyword 'from' 
+
+        - Modules __all__ = () statement limits what is matched by wildcards
+
+        - Subfolders can form part of a module package. They become modules if
+          the subfolder contains an __init__ module (__init__.py)
+        
+        - Subfolders without the __init__ module are not part of the package.
+
+        - Always leave the starting python script in a folder that can reach
+          everything else. Top folder. 
+        
+        - dir(object) function is awesome. I should use it more.
+
+        - @classmethod @staticmethod classmethod() and staticmethod()
+        
+        - Staticmethods are unbound functions housed in a class. 
+          They overshadow instance methods. They do share class attributes,
+          but they do not share instance attributes.
+        
+    
+      2:30 PM 10/01/2013. Failed miserably at the last koan. Got some recursive shit
+      going on that I couldnt debug. Fuck me. If after finishing lpthw I cant fix 
+      that code, then fuck this, Im a failure as a programmer. And by fixing I
+      mean having understanding why it didnt work.
+    
+      Back to lthw then.

@@ -1,0 +1,21 @@
+{% extends "blogbase.html" %}
+
+{% block content %}
+
+<form action="" method="POST" accept-charset="utf-8">
+
+  <label for="username"> Username:
+    <input type="text" name="username" value="" />
+  </label>
+
+  <label for="password"> Password:
+    <input type="text" name="password" value="" />
+  </label>
+
+  <input type="submit" name="submit" value="Submit"/>
+  <span class="error">{{ error_login }}</span>
+
+</form>
+
+
+{% endblock %}

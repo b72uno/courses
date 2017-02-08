@@ -1,0 +1,55 @@
+1. (a) 0 < pi < 10
+   (b) 7 <= p < 12
+   (c) 5 < x < 7
+   (d) x < 6
+   (e) -3 < y < 3
+   (f) x = 0
+
+2. (a) pi is less than 10 and greater than 0
+   (b) x is less than 12 and greater than or equal to 7
+   (c) x is less than 7 and greater than 5
+   (d) x is less than 6
+   (e) y is less than 4
+   (f) x is 0
+
+3. Show that all of phi-s are true, every single one of them.
+
+4. Show that any of phi-s are false, stop at the first one, because conjunction
+doesnt hold at that point anymore.
+
+5.   (a) pi > 3
+     (b) x <> 0
+     (c) x >= 0
+     (d) x >= 0
+     (e) again x < -3 v x > 3
+Not sure about those.
+
+6. Easy peasy lemon squeazy
+
+7. Show that any phi is true. At that point the disjunction is valid.
+
+8. Show that all phi-s are false. Have to iterate through every single one.
+
+9.   (a) pi <= 3.2
+     (b) x >= 0
+     (c) x = 0
+     (d) x <> 1
+     (e) phi
+
+10.  (a) pi is smaller or equal to 3.2
+     (b) x is gt or equal to 0
+     (c) x is lt or equal to 0
+     (d) x is not 1
+     (e) phi
+
+11.  (a) D ^ Y
+     (b) T ^ ~Y ^ D
+     (c) ~(D ^ Y)
+     (d) T ^ ~(D v Y)
+     (e) ~T ^ D ^ Y
+
+Discussion:
+It's always the bloody context.
+1. Yep, same
+2. The same way.
+

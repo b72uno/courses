@@ -1,0 +1,282 @@
+Taken from notes on K&R by Steve Summit &copy; 1995/1996
+
+* * * * * * * * * * * * * * *  Chapter One * * * * * * * * * * * * * * *
+
+ - Besides showing how to make effective use of the language, we (K&R) have
+tried where possible to illustrate useful algorithms and principles of good
+style and sound design.
+
+- C deals with the same sort of objects that most computers do, namely
+characters, numbers and addresses.
+
+- C retains the basic philosophy that programmers know what they are doing, it
+only requires that they state their intentions explicitly.
+
+- With these mechanical details mastered, everything else is comparatively easy.
+
+- ...main will usually call other functions to help perform its job, some that you
+wrote, and others from libraries that are provided for you.
+
+- Although C compilers do not care about how a program looks, proper identation
+and spacing are critical in making programs easy for people to read. We
+recommend writing only one statement per line, and using blanks around operators
+to clarify grouping. The position of braces is less important, although people
+hold passionate beliefs. We have chosen one of several popular styles. Pick a
+style that suits you, then use it consistently.
+
+- ...in C, as in many other languages, integer division truncates: any fractional
+parts is discarded.
+
+- ...in any context where  it is permissible to use the value of a variable of
+some type, you can use a more complicated expression of that type.
+
+- Notice that there is no semicolon at the end of a #define line.
+
+- Always use an int for anything you assign getchar's return value to.
+
+- while ((c = getchar()) != EOF) C's cryptic brevity is notorious.
+
+- Using an assignment as a subexpression (c = getchar()) is perfectly legal and
+quite common in C.
+
+- A clean, well-designed loop will work properly for all of its 'boundary
+conditions' : zero trips through the loop, one trip, many trips, maximum trips.
+If a loop for some reason doesn't work at a particular boundary condition, it's
+tempting to claim that that condition is rare or impossible and therefore the
+loop is okay. But if the loop can't handle the boundary condition, why can't it?
+It's probably awkwardly constructed, and straightening it out so that it
+naturally handles all boundary conditions will usually make it clearer and
+easier to understand (and may also remove or reveal other lurking bugs).
+
+- In a program as tiny as this, it makes little difference, but in larger
+programs, the increase in clarity is well worth the modest extra effort to write
+it this way from beginning. (Using symbolic constants and using them
+consistently)
+
+- ...you will often see a short function defined and called only once, just
+because it clarifies some piece of code.
+
+- C rarely if ever allocates memory implicitly for you. Always having to
+remember to allocate memory for new strings, can get tedious after a while.
+
+- (to[i] = from[i]) != '\0' copies characters from array to the to array and the
+at the same time compares the copied character against '\0' This is not really
+cryptic yet, wait until later. :)
+
+
+- There is no way for a user of getline to know in advance how long the input
+line might be, so getline checks must check for overflow.
+
+- Using fixed-size arrays is ok, as long as some assurance is made that they
+dont overflow. Also guard against array overflow.
+
+- If automatic variables are not set, they will contain garbage.
+
+- An external variable must be defined, exactly once, outside of any function;
+  this sets aside storage for it. The variable must also be declared in each
+function that wants to access it; this states the type of the variable. Define
+once, declare many times.
+
+- You should note that we (K&R) are using words definition and declaration
+  carefully when we refer to external variables in this section. "Definition"
+refers to the place where the variable is created or assigned storage;
+"Declaration" refers to places where the nature of variable is stated but no
+storage is allocated.
+
+
+* * * * * * * * * * * * * * *  Chapter Two * * * * * * * * * * * * * * *
+
+- The type of an object determines the set of values it can have and what
+operations can be performed on it.
+
+- Don't begin variable names with underscore, however. since library routines
+often use such names.
+
+- Keywords like if, else, int, float, etc are reserved. You can not use them as
+variable names
+
+- In enum if not all values are specified, unspecified values continue the
+  progression from the last specified value.
+
+- Names in different enumerations must be distinct. Values need not be distinct
+  in the same enumeration.
+
+- External and static variables are initialized to zero by default.
+
+- If you try to change a const, result is implementation defined.
+
+- Write one declaration per line when declaring variables. That way they are
+  more useful as you can sort them by use or alphabetically. If declared in one
+line they are slightly more useful than random order.
+
+- The direction of truncation for / and the sign of the result for % are
+  machine-dependent for negative operands, as is the action taken on overflow
+and underflow.
+
+- "Arithmetic" as an adjective is pronounced differently that the noun: the
+  accent is on the third syllable.
+
+- != has higher precedence than assignment (=), so mind your parentheses
+
+- Whether a char can be converted to a negative integer (when atoing) is also
+  machine dependant. Logic or arithmetic shift. 1s or 0s added on the left.
+  The definition of C guarantees that any character in standard printing
+  character set will never be negative. For portability specify signed or u.
+
+- In general mathematical functions like those in math.h will use doubles.
+
+- Comparisons between signed and unsigned values are machine-dependent as well.
+Example: -1L > 1UL because -1L is promoted to unsigned long and thus appears to
+be a large positive number.
+
+- When double is converted to float, whether the value is rounded or truncated,
+is implementation dependent.
+
+- Type conversion also takes place when arguments are passed to functions. In
+absence of prototype, char and short becomes int and float becomes double.
+When prototype is present, the coercion (casting) of any arguments is automatic.
+
+- A char is just a small integer, so chars may be freely used in arithmetic
+  expressions.
+
+- If you are ever dealing with arbitrary "bytes" of binary data, you'll usually
+  want to use unsigned char.
+
+- char < short int < int < long int < float < double < long double
+The lower type is promoted to the higher type.
+
+- The precedence of the bitwise operators &, ^ and | falls below == and !=. This
+  implies that bit-testing expressions like if ((x & MASK) == 0)...
+  must be fully parenthesized to give proper results.
+
+- When using ternary operator, if in expr1 ? expr2 : expr3
+expr2 and exp3 are of different types, the type of the result is determined by
+standard conversion rules.
+
+    Operators
+    Associativity
+    () [] -> .
+    left to right
+    ! ~ ++ -- + - * (type) sizeof
+    right to left
+    * / %
+    left to right
+    + -
+    left to right
+    << >>
+    left to right
+    < <= > >=
+    left to right
+    == !=
+    left to right
+    &
+    left to right
+    ^
+    left to right
+    |
+    left to right
+    &&
+    left to right
+    ||
+    left to right
+    ?:
+    right to left
+    = += -= *= /= %= &= ^= |= <<= >>=
+    right to left
+    ,
+    left to right
+
+- Note that precedence is NOT the same thing as order of evaluation. Precedence
+  determines how an expression is parsed, and it has an influence on the order
+in which parts are evaluated, but the influence isnt as strong as you'd think.
+Precedence says that in the expression 1 + 2 * 3 the multiplication happens
+before the addition. But if we have several function calls such as f() + g() *
+h() we have no idea which function will be called first; the compiler might
+arrange to call f() first even though its value wont be needed until last.
+If we were to write an abomination like:
+        a = 1;
+        a[i++] + a[i++] * a[i++]
+we would have no way of knowing which order of the three increments would happen
+in, and in fact the compiler wouldnt have any idea either. We could NOT argue
+that since multiplication has higher precedence than addition, and since
+multiplication associates from left to right, the second i++ would have to
+happen first, then the third and then the first. (Associativity NEVER says
+anything about which side of a single binary operator gets evaluated first;
+associativity says which of several adjacent same-precedence operators happens
+first.)
+
+    In general you can assume that precedence will dictate the order in which
+binary operators are applied. i.e. the precedence of * over + says more than the
+multiplication happens first. You also can assume that the && and || operators
+are evaluated left-to-right and that the right-hand side is not evaluated at all
+if the left-hand side determines the outcome.
+
+
+- Function calls, nested assignment statements, and increment and decrement
+  operators cause "side effects"  - some variable is changed as a by-product of
+the evaluation of an expression.
+
+- Writing code that depends on order of evaluation is a bad programming practice
+in any language. Naturally, it is necessary to know what things to avoid, but
+if you dont know how they are done on various machines, you wont be tempted to
+take advantage of particular implementation.
+
+
+
+* * * * * * * * * * * * * * *  Chapter Three * * * * * * * * * * * * * * *
+
+- The semicolon is a statment terminator in C. Braces { } are used to group
+  declarations and statements together into a compound statement or block.
+
+- There is no semicolon after the right brace that ends the block
+
+- It's a good idea to use braces when there are nested ifs.
+
+- In switch statements as a matter of good form, put a break after the last
+  case. Even though its logically unnecessary, some day when another case gets
+  added at the end, this bit of defensive programming will save you.
+
+- The commas that separate function arguments, variables in declarations, etc.,
+  are NOT comma operators, and do not guarantee left to right evaluation. Comma
+  operator most often finds use in the for statement.
+
+- Whether to use while or for is largely a matter of personal preference...
+  Nonetheless, it is bad style to force unrelated computations into the
+  initialization and increment of a for, which are better reserved for loop
+  control operations.
+
+- Each step does its part, and leaves things in a clean state for the next
+
+- Invariant - some condition which exists at all stages of a program or a
+  function.
+
+- The generality of "for" makes the outer loop (shellsort) fit the same form as
+others, even though its not an arithmetic progression, e.g. loops dont have
+to count. Some loops dont step over numbers at all.
+
+- Goto may find a place in cases where it is needed to abandon processing in
+some deeply nested structure, such as breaking out of two or more loops at once.
+
+
+* * * * * * * * * * * * * * *  Chapter Four * * * * * * * * * * * * * * * * * *
+
+- Functions break large computing tasks into smaller ones, and enable people to
+  build on what others have done instead of starting over from scratch.
+  Appropriate functions hide details of operation from parts of the program that
+  don't need to know about them, thus clarifying the whole, and easing the pain of
+  making changes.
+
+- C has been designed to make functions efficient and easy to use; C programs
+  generally consist of many small functions rather than a few big ones.
+
+- A program is just a set of definitions of variables and functions.
+
+- The function (atof) must be declared and defined constantly. If atof itself
+  and the call to it in main have inconsistent types in the same source file,
+the error will be detected by the compiler. But if (as is more likely) atof was
+compiled seperately, the mismatch would not be detected, atof would return a
+double that main would treat as an int, and meaningless answers would result.
+
+- Thus if two functions must share some data, yet neither calls the other, it
+  is often most convenient if the shared data is kept in external variables
+  rather than passed in and out via arguments.

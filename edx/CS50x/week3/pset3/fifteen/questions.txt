@@ -1,0 +1,9 @@
+questions.txt
+
+Computer Science 50
+Problem Set 3
+
+0. Any grid A x A where A is a number between 3 to 9 inclusive  
+1. Nested array 
+2. greet
+3. init, draw, move and won 

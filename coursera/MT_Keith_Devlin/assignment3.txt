@@ -1,0 +1,27 @@
+1.  (a) T => D ^ Y
+    (b) D => ~Y
+    (c) ~D => ~T or T => D
+    (d)  T => ~(D ^ Y)
+    (e) T ^ ~D ^ Y // from language infering that trade agreement is signed
+    (f) T => (Y => ~D) // not sure about this one, how to display the condition
+    (g) T => (D ^ Y) v ~(D v Y)
+    (h) T => D v Y
+
+2. ~phi    | phi implies psi | ~phi or psi
+    F      | T               | T
+    F      | F               | F
+    T      | T               | T
+    T      | T               | F
+
+3. Truth can imply only truth. Falsity implies anything. In a disjunction only
+one term needs to be true.
+
+4. ~psi | phi implies psi | phi not implies psi | phi or ~psi
+     F  | T               | F                   | F
+     T  | F               | T                   | T
+     F  | T               | F                   | F
+     T  | T               | F                   | F
+
+
+5. Same as from previous table? Not sure.
+

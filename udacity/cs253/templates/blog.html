@@ -1,0 +1,17 @@
+{% extends "blogbase.html" %}
+
+{% block content %}
+
+    {% for post in posts %}
+    <article>
+    <h2><a href="/blog/{{ post.key().id() }}">{{ post.subject }}</a></h2>
+    <span class="date"><em>{{ post.created }}</em></span>
+    <p>
+    {{ post.content }}
+    </p>
+    </article>
+    <span class="separator"></span>
+    {% endfor %}
+    <span class="generated"> Queried {{ generated }} seconds ago </span>
+
+{% endblock %}

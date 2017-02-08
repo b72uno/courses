@@ -1,0 +1,23 @@
+{% extends "wikibase.html" %}
+
+{% block content %}
+
+WIKIHIST
+You are viewing page: {{ current_page }}
+
+<br>
+
+<div class="content">
+        </ul>
+        {% for item in history %}
+        <li>{{ item }} </li>
+        {% endfor %}
+    </ul>
+</div>
+
+
+
+{% endblock %}
+
+
+

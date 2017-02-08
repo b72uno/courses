@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome - Blob Blog</title>
+
+    <style type="text/css">
+        html { font-family: sans-serif; line-height: 1.8em;}
+        h1 { font-family: serif; text-align: center; padding-bottom: 20px; }
+        footer { color: #ccc; display: block; text-align: center; clear: both; }
+        .date { color: #888; }
+        p { padding: 10px; padding-bottom: 20px; }
+        .separator { border-top: 1px solid #ccc; border-bottom: 1px solid #222; display: block; margin: 20px 0; }
+        input, textarea, .error { display: block; }
+        .error { color: red; }
+        a, a:hover { text-decoration: none; color:black; }
+    </style>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44893033-1', 'udacity-testapp.appspot.com');
+  ga('send', 'pageview');
+</script>
+
+</head>
+<body>
+    <h1>Almighty CS253 Blog</h1>
+
+    {% block content %}
+    {% endblock %}
+
+    <footer>
+        <span>Hello, and Goodbye!</span>
+    </footer>
+
+</body>
+</html>

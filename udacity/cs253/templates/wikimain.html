@@ -1,0 +1,21 @@
+{% extends "wikibase.html" %}
+
+{% block content %}
+
+WIKIMAIN
+You are viewing page: {{ current_page }}
+
+<br>
+
+<div class="content">
+    {% if page %}
+        {{ page.content | safe }}
+    {% endif %}
+</div>
+
+
+
+{% endblock %}
+
+
+

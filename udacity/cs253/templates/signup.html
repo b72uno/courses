@@ -1,0 +1,32 @@
+{% extends "blogbase.html" %}
+
+{% block content %}
+
+<form action="" method="POST" accept-charset="utf-8">
+
+  <label for="username"> Username:
+      <input type="text" name="username" value="{{ username }}" />
+    <span class="error">{{ error_username }}</span>
+  </label>
+
+  <label for="password"> Password:
+    <input type="text" name="password" value="" />
+    <span class="error">{{ error_password }}</span>
+  </label>
+
+  <label for="verify"> Confirm Your Password:
+    <input type="text" name="verify" value="" />
+    <span class="error">{{ error_verify }}</span>
+  </label>
+
+  <label for="email"> E-mail(Optional):
+      <input type="email" name="email" value=" {{ email }} " />
+    <span class="error">{{ error_email }}</span>
+  </label>
+
+  <input type="submit" name="submit" value="Submit"/>
+
+</form>
+
+
+{% endblock %}

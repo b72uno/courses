@@ -1,0 +1,160 @@
+0.  How many colors does each format support?
+=============================================
+A:  BMP - Depends on bits per pixel (bpp)
+    1bpp supports 2 colors, 2bpp 4 colors, 4bpp 16 colors,
+    8bpp 256 colors, 16bpp 65536 colors, 24bpp 16 777 216 colors,
+    32bpp supports 4 294 967 296 colors.
+    GIF - supports up to 8 bits,thus 256 colors.
+    PNG - 24 bit RGB or 32 bit RGBA colors.
+    JPG - embeds ICC color profile, which commonly is sRGB or Adobe RGB
+    supporting 24bit (16 777 216) colors.
+
+1. Which of there formats supports animation?
+=============================================
+A: GIF
+
+2.  What's the difference between lossy and lossless compression?
+=================================================================
+A: Lossless data compression allows the exact original data to be reconstructed
+from the compressed data. No information is lost in compression process. Lossy
+data compression only allows constructing an approximation of the original data,
+in exchange for better compression rates. Lossless compression is used in cases
+where it is important that the original and the decompressed data be identical,
+or where deviations from the original data could be deleterious. Typical
+examples are executable programs, text documents and source code. Some image
+formats like PNG or GIF use only lossless compression, while others like TIFF
+and MNG may use lossless or lossy methods.
+
+3.  Which of these formats is lossy-compressed?
+===============================================
+A: JPEG
+
+4.  What happens,technically, when a file is deleted on a FAT file system?
+==============================================================
+A: A hard disk is always addressed in terms of sectors. A FAT file system
+further groups data into clusters, which consist of 2^i sectors where i is a
+parameter set when the drive is formatted. Each hard-disk cluster has an entry
+in the FAT that describes its status. The cluster is either:
+    - Part of a file, and points to the next cluster of that file.
+    - The last cluster in file, and thus holds EOF value.
+    - Free, and thus zero.
+    - Marked defective.
+When OS erases a FAT file, 2 things occur:
+    1. The system modifies the filename's first character in the file's
+    directory entry to signal that the file has been deleted and the directory
+    entry can be recycled.
+    2. Moves all of the file's FAT clusters to the hard drive's list of free
+    clusters.
+The actual file data is never touched.
+
+5.  What can someone like you do to ensure (with high probability) that files
+you delete cannot be recovered?
+=============================================================================
+A: Either:
+    - Physically destroy the drive, render it unusable
+    - Degauss it, randomizing magnetic domains, and probably rendering it
+      unusable in the process.
+    - Overwriting the data, so it can not be recovered. Peter Gutmann
+      argues that it is theoretically possible to retrieve information written
+      to any magnetic recording device because the disk platter's low-level
+      magnetic field patterns are a function of both the written and overwritten
+      data. When computer attemtpts to write a one or a zero to disk, the media
+      records it as such, but the actual effect is closer to obtaining 1.05 when
+      overwrites with a one and 0.95 when overwrites with a zero. Although
+      normal disk circuitry will read both values as ones, using special
+      circuitry it is possible to work out what previous layers contained.
+      Gutmann claims that a high quality digital sampling oscilloscope or
+      Magnetic Force Microscopy (MFM) can be used to retrieve overwritten data.
+      Gutmann presents some 22 different patterns that one can use to minimize
+      data recovery. On modern disks, overwriting data with a few random passes
+      will sufficiently sanitize it.
+
+6.  What's stdint.h?
+====================
+A: stdint.h is a header file that defines integer types.
+
+7. Whats the point of using uint8_t, uint32_t and uint16_t in a program?
+========================================================================
+A: Not sure I understand the question. If why unsigned numbers, then there is a
+difference between signed and unsigned numbers in how MSB is interpreted. If no
+negative numbers are needed in a program, you can effectively double the maximum
+value of a number you can store in given bits of those integer data types.
+If whats the point of differentiating between uint8_t (char), uint16_t(short)
+and uint32_t(int), I'd guess that if memory is a constraint, then you'd
+defintely want to minimize using it and not store a character in 32 bit data
+type when you can use 8 bits.
+
+8. How many bytes is a BYTE, a DWORD, a LONG and a WORD, respectively. Assume a
+32-bit architecture like the CS50 Appliance.
+===============================================================================
+A: According to MSDN:
+            BYTE  : 8 bit unsigned value
+            DWORD : 32-bit unsigned integer
+            LONG  : 32-bit signed integer
+            WORD  : 16-bit unsigned integer
+
+9.  What (in ASCII, decimal, or hexadecimal) must the first two bytes of any BMP
+file be? (Leading bytes used to identify file formats (with high probability)
+are generally called "magic numbers".)
+=============================================================================
+A: From the depths of the internet:
+
+        File Type   : Hex digits     : ASCII digits (. - not an ascii char)
+        -------------------------------------------------------------------
+        BMP         : 42 4d          : BM
+        PNG         : 89 50 4e 47    : .PNG
+        JPG         : ff d8 ff e0    : ....
+        GIF         : 47 49 46 38    : GIF8
+        Bzip        : 42 5a          : BZ
+        gzip        : 1f 8b          : ..
+        tar (posix) : 75 73 74 61 72 : utar (offset by 257 bytes)
+
+10. Whats the difference between bfSize and biSize?
+===================================================
+A: bfSize is the size, in bytes, of the bitmap file. biSize is the number of
+bytes required by the structure - the size of BITMAPINFOHEADER.
+
+11. What does it mean if biHeight is negative?
+==============================================
+A: It means that bitmap is placed in memory top-down, i.e. the first byte in
+memory is the top left pixel of the image. If biHeight is positive, the image is
+bottom-up or the first byte in memory is bottom left pixel of the image.
+
+12. What field in BITMPAINFOHEADER specifies the BMP's color depth? (bpp)
+=========================================================================
+A: biBitCount represents the number of bits-per-pixel. 0/1/4/8/16/32
+
+13. Why might fopen return NULL in copy.c:37?
+=============================================
+A: When the program doesnt have permissions needed to operate on or create the
+file.
+
+14. Why is the third argument to fread always 1 in our code?
+============================================================
+A: Because we want to read the size of the structure. We define the size in
+second argument and effectively multiplying (what 3rd argument does) by
+something other than one will result in incorrect read/write for our purposes.
+Not sure about this, though.
+
+15. What value does copy.c:70 assign padding if bi.biWidth is 3?
+================================================================
+A: (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4 =
+   (4 - (8 * 3) % 4 ) % 4 = 4 - 0 % 4 = 0
+
+16. What does fseek do?
+=======================
+A: fseek(FILE *stream. long offset, int whence) by adding offset bytes to
+position specified by whence fseek changes the file position indicator.
+whence can be SEEK_SET, SEEK_CUR, SEEK_END specifying the start, the current
+location and end of the stream respectively.
+
+17. What is SEEK_CUR
+======================
+A: Represents the current file position indicator in stream.
+
+18. Whodunit?
+=============
+A: I have absolutely no idea what is in that picture. It must be some reference.
+Looks like some weird dude with earmuffs on his head and a bag in his hands.
+
+
