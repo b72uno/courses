@@ -84,40 +84,40 @@ class Vector(object):
             else:
                 raise e
 
+
     def is_zero(self, tolerance=1e-10):
         return self.magnitude() < tolerance
 
+
     def is_parallel_to(self, v):
         return (self.is_zero() or v.is_zero() or self.theta(v) == 0 or self.theta(v) == math.pi)
+
 
     def is_orthogonal_to(self, v, tolerance=1e-10):
         return abs(self.dot(v))  < tolerance
 
 
+    def v_perp(self, basis_v):
+        return self.subtract(self.v_parallel(basis_v))
 
-print(Vector([1.12,2.13,3.14,4.15]).sum())
-print(Vector([1.12,2.13,3.14,4.15]).average())
-print('--------------')
-print(Vector([8.218, -9.341]).add(Vector([-1.129, 2.111])))
-print(Vector([7.119, 8.215]).subtract(Vector([-8.223, 0.878])))
-print(Vector([1.671, -1.012, -0.318]).scale(7.41))
-print('--------------')
-print(Vector([-0.221, 7.437]).magnitude())
-print(Vector([8.813, -1.331, -6.247]).magnitude())
-print(Vector([5.581, -2.136]).normalized())
-print(Vector([1.996, 3.108, -4.554]).normalized())
-print('--------------')
-print(Vector([7.887, 4.138]).dot(Vector([-8.802, 6.776])))
-print(Vector([-5.955, -4.904, -1.874]).dot(Vector([-4.496, -8.755, 7.103])))
-print(Vector([3.183, -7.627]).theta(Vector([-2.668, 5.319]), in_degrees=False))
-print(Vector([7.35, 0.221, 5.188]).theta(Vector([2.751, 8.259, 3.985]), in_degrees=True))
-print('--------------')
-print(Vector([-7.579, -7.88]).is_parallel_to(Vector([22.737, 23.64])))
-print(Vector([-7.579, -7.88]).is_orthogonal_to(Vector([22.737, 23.64])))
-print(Vector([-2.029, 9.97, 4.172]).is_parallel_to(Vector([-9.231, -6.639, -7.245])))
-print(Vector([-2.029, 9.97, 4.172]).is_orthogonal_to(Vector([-9.231, -6.639, -7.245])))
-print(Vector([-2.328, -7.284, -1.214]).is_parallel_to(Vector([-1.821, 1.072, -2.94])))
-print(Vector([-2.328, -7.284, -1.214]).is_orthogonal_to(Vector([-1.821, 1.072, -2.94])))
-print(Vector([2.118, 4.827]).is_parallel_to(Vector([0, 0])))
-print(Vector([2.118, 4.827]).is_orthogonal_to(Vector([0, 0])))
-print('--------------')
+
+    def v_parallel(self, basis_v):
+        return (basis_v.normalized()).scale(self.dot(basis_v.normalized()))
+
+
+    def cross_product(self, vector):
+        v = self.coordinates
+        w = vector.coordinates
+
+        assert(len(v) == 3 and len(w) == 3)
+
+        return Vector([v[1] * w[2] - w[1] * v[2],
+                -(v[0] * w[2] - w[0] * v[2]),
+                v[0] * w[1] - w[0] * v[1]])
+
+
+    def parallelogram(self, vector):
+        return self.cross_product(vector).magnitude()
+
+    def triangle(self, vector):
+        return Decimal(0.5) * self.parallelogram(vector)

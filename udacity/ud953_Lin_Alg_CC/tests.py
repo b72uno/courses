@@ -26,11 +26,14 @@ print(Vector([-2.328, -7.284, -1.214]).is_orthogonal_to(Vector([-1.821, 1.072, -
 print(Vector([2.118, 4.827]).is_parallel_to(Vector([0, 0])))
 print(Vector([2.118, 4.827]).is_orthogonal_to(Vector([0, 0])))
 print('--------------')
+print(Vector([3.039, 1.879]).v_parallel(Vector([0.825, 2.036])))
+print(Vector([-9.88, -3.264, -8.159]).v_perp(Vector([-2.155, -9.353, -9.473])))
+print(Vector([3.009, -6.172, 3.692, -2.51]).v_perp(Vector([6.404, -9.144, 2.759, 8.718])))
+print(Vector([3.009, -6.172, 3.692, -2.51]).v_parallel(Vector([6.404, -9.144, 2.759, 8.718])))
+print('--------------')
+print(Vector([8.462, 7.893, -8.187]).cross_product(Vector([6.984, -5.975, 4.778])))
+print(Vector([-8.987, -9.838, 5.031]).parallelogram(Vector([-4.268, -1.861, -8.866])))
+print(Vector([1.5, 9.547, 3.691]).triangle(Vector([-6.007, 0.124, 5.772])))
 
-
-         #ntoes #%win #fans
-weights = [[0.1, 0.1, -0.3],# hurt?
-           [0.1, 0.2, 0.0], # win?
-           [0.0, 1.3, 0.1]] # sad?
 
 
