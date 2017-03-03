@@ -13,7 +13,7 @@ class Line(object):
         self.dimension = 2
 
         if not normal_vector:
-            all_zeros = ['0']*self.dimension
+            all_zeros = ['0'] * self.dimension
             normal_vector = Vector(all_zeros)
         self.normal_vector = normal_vector
 
@@ -28,12 +28,12 @@ class Line(object):
         try:
             n = self.normal_vector
             c = self.constant_term
-            basepoint_coords = ['0']*self.dimension
+            basepoint_coords = ['0'] * self.dimension
 
             initial_index = Line.first_nonzero_index(n)
             initial_coefficient = n[initial_index]
 
-            basepoint_coords[initial_index] = c/initial_coefficient
+            basepoint_coords[initial_index] = c / Decimal(initial_coefficient)
             self.basepoint = Vector(basepoint_coords)
 
         except Exception as e:
@@ -95,6 +95,22 @@ class Line(object):
             if not MyDecimal(item).is_near_zero():
                 return k
         raise Exception(Line.NO_NONZERO_ELTS_FOUND_MSG)
+
+
+    def is_parallel_to(self, line):
+        return Vector(self.normal_vector).is_parallel_to(Vector(line.normal_vector))
+
+
+    def is_equal_to(self, line):
+        vector_between_points = Vector([0, line.constant_term]).subtract(Vector([0, self.constant_term]))
+        # vector_between_points = Vector(line.normal_vector).subtract(Vector(self.normal_vector))
+        return Vector(self.normal_vector).is_orthogonal_to(vector_between_points) and \
+            Vector(line.normal_vector).is_orthogonal_to(vector_between_points)
+
+
+    def intersection_with(self, line):
+        if not self.is_parallel_to(line):
+            pass
 
 
 class MyDecimal(Decimal):
