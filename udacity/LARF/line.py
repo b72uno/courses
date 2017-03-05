@@ -23,13 +23,11 @@ class Line(object):
 
         self.set_basepoint()
 
-
     def is_parallel_to(self, line):
         v1 = self.normal_vector
         v2 = line.normal_vector
 
         return v1.is_parallel_to(v2)
-
 
     def set_basepoint(self):
         try:
@@ -52,9 +50,7 @@ class Line(object):
             else:
                 raise e
 
-
     def __str__(self):
-
         num_decimal_places = 3
 
         def write_coefficient(coefficient, is_initial_term=False):
@@ -81,7 +77,8 @@ class Line(object):
 
         try:
             initial_index = Line.first_nonzero_index(n)
-            terms = [write_coefficient(n[i], is_initial_term=(i==initial_index)) + 'x_{}'.format(i+1)
+            terms = [write_coefficient(n[i], is_initial_term=(i==initial_index)) + \
+                     'x_{}'.format(i+1)
                      for i in range(self.dimension) if round(n[i], num_decimal_places) != 0]
             output = ' '.join(terms)
 

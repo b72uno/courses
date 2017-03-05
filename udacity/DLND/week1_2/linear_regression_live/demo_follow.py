@@ -1,8 +1,9 @@
 from numpy import *
 
+
 def compute_error_for_line_given_points(b, m, points):
     # error(m,b) = 1/n sigma i=1 to n (y_i - (mx_i + b))^2
-    
+
     #initialize the error at 0
     totalError = 0
 
@@ -33,7 +34,7 @@ def step_gradient(b_current, m_current, points, learning_rate):
         y = points[i, 1]
 
         # direction with respect to b and m
-        
+
         # computing partial derivatives of our error function
         # for every single point we have
         # with respect to b and m
@@ -74,7 +75,7 @@ def run():
     # how fast should our model converge?
     learning_rate = 0.0001
 
-    # y = mx + b 
+    # y = mx + b
     initial_b = 0
     initial_m = 0
 
@@ -84,13 +85,13 @@ def run():
     # Step 3 - train our model
 
     #print our starting point
-    print 'starting gradient descent at b = {0}, m = {1}, error = {2}'.format(initial_b, initial_m, compute_error_for_line_given_points(initial_b, initial_m, points))
+    print('starting gradient descent at b = {0}, m = {1}, error = {2}'.format(initial_b, initial_m, compute_error_for_line_given_points(initial_b, initial_m, points)))
 
     # perform gradient descent, will give us optimal slope and y intercept
     [b, m] = gradient_descent_runner(points, initial_b, initial_m, learning_rate, num_iterations)
 
     #print our ending point
-    print 'ending gradient descent at b = {0}, m = {1}, error = {2}'.format(b, m, compute_error_for_line_given_points(b, m, points))
+    print('ending gradient descent at b = {0}, m = {1}, error = {2}'.format(b, m, compute_error_for_line_given_points(b, m, points)))
 
 
 if __name__ == '__main__':
