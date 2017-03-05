@@ -15,7 +15,7 @@ class Line(object):
         if not normal_vector:
             all_zeros = ['0'] * self.dimension
             normal_vector = Vector(all_zeros)
-        self.normal_vector = normal_vector
+        self.normal_vector = Vector(normal_vector)
 
         if not constant_term:
             constant_term = Decimal('0')
@@ -24,15 +24,25 @@ class Line(object):
         self.set_basepoint()
 
 
+    def is_parallel_to(self, line):
+        v1 = self.normal_vector
+        v2 = line.normal_vector
+
+        return v1.is_parallel_to(v2)
+
+
     def set_basepoint(self):
         try:
-            n = self.normal_vector
+            n = self.normal_vector.coordinates
             c = self.constant_term
             basepoint_coords = ['0'] * self.dimension
 
             initial_index = Line.first_nonzero_index(n)
             initial_coefficient = n[initial_index]
 
+            # Ax + By = k
+            # if B =/= 0, take x = 0, y = k/B, baseoint is (0, k/B)
+            # if A =/= 0, take y = 0, x = k/A, basepoint is (k/A, 0)
             basepoint_coords[initial_index] = c / Decimal(initial_coefficient)
             self.basepoint = Vector(basepoint_coords)
 
@@ -67,7 +77,7 @@ class Line(object):
 
             return output
 
-        n = self.normal_vector
+        n = self.normal_vector.coordinates
 
         try:
             initial_index = Line.first_nonzero_index(n)
@@ -97,20 +107,59 @@ class Line(object):
         raise Exception(Line.NO_NONZERO_ELTS_FOUND_MSG)
 
 
-    def is_parallel_to(self, line):
-        return Vector(self.normal_vector).is_parallel_to(Vector(line.normal_vector))
+    def __eq__(self, line2):
 
+        if self.normal_vector.is_zero():
+            if not line2.normal_vector.is_zero():
+                return False
+            else:
+                diff = self.constant_term - line2.constant_term
+                return MyDecimal(diff).is_near_zero()
+        elif line2.normal_vector.is_zero():
+            return False
 
-    def is_equal_to(self, line):
-        vector_between_points = Vector([0, line.constant_term]).subtract(Vector([0, self.constant_term]))
-        # vector_between_points = Vector(line.normal_vector).subtract(Vector(self.normal_vector))
-        return Vector(self.normal_vector).is_orthogonal_to(vector_between_points) and \
-            Vector(line.normal_vector).is_orthogonal_to(vector_between_points)
+        if not self.is_parallel_to(line2):
+            return False
+
+        # get vector connecting both basepoints
+        v1 = self.basepoint
+        v2 = line2.basepoint
+
+        basepoint_difference = v1.subtract(v2)
+
+        n = self.normal_vector
+
+        # no need to check both lines as they are parallel
+        return basepoint_difference.is_orthogonal_to(n)
 
 
     def intersection_with(self, line):
         if not self.is_parallel_to(line):
-            pass
+            try:
+                l1 = self
+                l2 = line
+                v1 = self.normal_vector.coordinates
+                v2 = line.normal_vector.coordinates
+
+                k1 = l1.constant_term
+                k2 = l2.constant_term
+                B = Decimal(v1[1])
+                A = Decimal(v1[0])
+                C = Decimal(v2[0])
+                D = Decimal(v2[1])
+
+                x = (D * k1 - B * k2) / (A * D - B * C)
+                y = ((-1 * (C * k1)) + A * k2) / (A * D - B * C)
+
+                return (x,y)
+
+            except ZeroDivisionError:
+                if self == line2:
+                    return self
+                else:
+                    return None
+        else:
+            return False
 
 
 class MyDecimal(Decimal):

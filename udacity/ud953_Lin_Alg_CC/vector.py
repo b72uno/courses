@@ -94,7 +94,7 @@ class Vector(object):
 
 
     def is_orthogonal_to(self, v, tolerance=1e-10):
-        return abs(self.dot(v))  < tolerance
+        return abs(self.dot(v)) < tolerance
 
 
     def v_perp(self, basis_v):
