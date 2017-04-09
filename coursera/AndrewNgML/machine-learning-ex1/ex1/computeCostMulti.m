@@ -18,7 +18,7 @@ pred_y = (X * theta);
 deltas = (pred_y - y);
 % delta = (1 / (2 * m)) * sum(deltas);
 delta = (1 / (2 * m)) * dot(transpose(deltas), deltas);
-J = delta
+J = delta;
 
 % =========================================================================
 

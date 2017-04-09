@@ -11,10 +11,11 @@ theta = zeros(size(X, 2), 1);
 %
 
 % ---------------------- Sample Solution ----------------------
-
-
-
-
+%theta = (dot(pinv(dot(transpose(X), X)), transpose(X)) * y)
+first = transpose(X) * X;
+second = pinv(first) * transpose(X);
+third = second * y;
+theta = third;
 % -------------------------------------------------------------
 
 
