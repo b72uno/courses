@@ -13,9 +13,12 @@ J = 0;
 % Instructions: Compute the cost of a particular choice of theta
 %               You should set J to the cost.
 
-
-
-
+pred_y = (X * theta);
+% deltas = (pred_y - y) .^ 2;
+deltas = (pred_y - y);
+% delta = (1 / (2 * m)) * sum(deltas);
+delta = (1 / (2 * m)) * dot(transpose(deltas), deltas);
+J = delta
 
 % =========================================================================
 

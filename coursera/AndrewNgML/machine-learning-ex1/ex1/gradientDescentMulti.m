@@ -17,20 +17,21 @@ for iter = 1:num_iters
     %       of the cost function (computeCostMulti) and gradient here.
     %
 
+    J = computeCostMulti(X, y, theta);
 
+    pred_y = X * theta;
+    target_y = y;
 
+    deltas = pred_y - target_y;
+    weight_deltas = transpose(X) * deltas;
 
-
-
-
-
-
+    theta = theta - (weight_deltas .* (alpha * (1/m)));
 
 
     % ============================================================
 
     % Save the cost J in every iteration    
-    J_history(iter) = computeCostMulti(X, y, theta);
+    J_history(iter) = J;
 
 end
 
