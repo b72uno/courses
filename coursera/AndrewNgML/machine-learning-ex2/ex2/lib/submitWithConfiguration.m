@@ -64,6 +64,7 @@ end
 function response = submitParts(conf, email, token, parts)
   body = makePostBody(conf, email, token, parts);
   submissionUrl = submissionUrl();
+
   responseBody = getResponse(submissionUrl, body);
   jsonResponse = validateResponse(responseBody);
   response = loadjson(jsonResponse);
