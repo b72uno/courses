@@ -9,10 +9,10 @@ def relu(x):
 def relu2deriv(x):
     return x > 0
 
-inputs = np.array([[1, 0, 0],
-                   [0, 1, 1],
+inputs = np.array([[1, 0, 1],
                    [0, 1, 0],
-                   [1, 0, 1]])
+                   [0, 0, 1],
+                   [1, 1, 1]])
 
 outputs = np.array([[1, 1, 0, 0]]).T
 
@@ -23,10 +23,10 @@ output_size = outputs.shape[1]
 weights_0_1 = 2 * np.random.random((input_size, hidden_size)) - 1
 weights_1_2 = 2 * np.random.random((hidden_size, output_size)) - 1
 
-learning_rate = 0.1
 epochs = 100
+learning_rate = 0.02
 
-for epoch in range(epochs):
+for x in range(epochs):
     error = 0
     for i in range(len(inputs)):
         layer_0 = inputs[i:i+1]
@@ -45,5 +45,8 @@ for epoch in range(epochs):
         weights_1_2 -= weights_1_2_delta * learning_rate
         weights_0_1 -= weights_0_1_delta * learning_rate
 
-    if epoch % 10 == 9:
+    if x % 9 == 0:
         print("Error: {}".format(error))
+
+
+
