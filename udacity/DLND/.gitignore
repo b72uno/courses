@@ -2,4 +2,5 @@ fast-style-transfer/
 DeepLearningFLappyBird/
 data/
 core/
+logs/
 .DS_Store
