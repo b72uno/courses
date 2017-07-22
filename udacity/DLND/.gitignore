@@ -3,4 +3,6 @@ DeepLearningFLappyBird/
 data/
 core/
 logs/
+checkpoint
 .DS_Store
+save.*
