@@ -13078,7 +13078,7 @@ Model Trained and Saved
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[60]:</div>
+<div class="prompt input_prompt">In&nbsp;[63]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">sentence_to_seq</span><span class="p">(</span><span class="n">sentence</span><span class="p">,</span> <span class="n">vocab_to_int</span><span class="p">):</span>
@@ -13091,8 +13091,8 @@ Model Trained and Saved
     <span class="c1"># TODO: Implement Function</span>
     
     <span class="n">unk_id</span> <span class="o">=</span> <span class="mi">2</span>
+    
     <span class="n">words</span> <span class="o">=</span> <span class="p">[</span><span class="n">vocab_to_int</span><span class="p">[</span><span class="n">word</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span> <span class="k">if</span> <span class="n">word</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">vocab_to_int</span> <span class="k">else</span> <span class="n">unk_id</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sentence</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
     
     <span class="k">return</span> <span class="n">words</span>
 
@@ -13117,8 +13117,7 @@ Model Trained and Saved
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[3, 6, 5, 2, 4]
-Tests Passed
+<pre>Tests Passed
 </pre>
 </div>
 </div>
@@ -13138,10 +13137,10 @@ Tests Passed
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[62]:</div>
+<div class="prompt input_prompt">In&nbsp;[67]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">translate_sentence</span> <span class="o">=</span> <span class="s1">&#39;our least liked fruit is the lemon , but my least liked is the grape &#39;</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">translate_sentence</span> <span class="o">=</span> <span class="s1">&#39;he saw a old yellow truck .&#39;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -13189,15 +13188,14 @@ Tests Passed
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[184, 34, 103, 22, 82, 63, 120, 109, 183, 196, 34, 103, 82, 63, 14]
-INFO:tensorflow:Restoring parameters from checkpoints/dev
+<pre>INFO:tensorflow:Restoring parameters from checkpoints/dev
 Input
-  Word Ids:      [184, 34, 103, 22, 82, 63, 120, 109, 183, 196, 34, 103, 82, 63, 14]
-  English Words: [&#39;our&#39;, &#39;least&#39;, &#39;liked&#39;, &#39;fruit&#39;, &#39;is&#39;, &#39;the&#39;, &#39;lemon&#39;, &#39;,&#39;, &#39;but&#39;, &#39;my&#39;, &#39;least&#39;, &#39;liked&#39;, &#39;is&#39;, &#39;the&#39;, &#39;grape&#39;]
+  Word Ids:      [99, 122, 203, 135, 104, 118, 214]
+  English Words: [&#39;he&#39;, &#39;saw&#39;, &#39;a&#39;, &#39;old&#39;, &#39;yellow&#39;, &#39;truck&#39;, &#39;.&#39;]
 
 Prediction
-  Word Ids:      [177, 281, 182, 271, 48, 43, 32, 51, 208, 65, 271, 48, 182, 43, 102, 355, 1]
-  French Words: notre fruit est moins aimé le citron , mais mon moins aimé est le raisin . &lt;EOS&gt;
+  Word Ids:      [129, 172, 70, 114, 349, 280, 355, 1]
+  French Words: il vu un vieux camion rouge . &lt;EOS&gt;
 </pre>
 </div>
 </div>
