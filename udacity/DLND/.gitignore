@@ -2,8 +2,11 @@ fast-style-transfer/
 DeepLearningFLappyBird/
 data/
 core/
+core
 logs/
 checkpoint
+checkpoints/
+*ckpt*
 .DS_Store
 save.*
 *.p
