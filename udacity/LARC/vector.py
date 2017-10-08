@@ -90,6 +90,7 @@ class Vector(object):
 
 
     def is_parallel_to(self, v):
+        # one is 0 or if they point in the same (0) or opposite (math.pi) directions
         return (self.is_zero() or v.is_zero() or self.theta(v) == 0 or self.theta(v) == math.pi)
 
 
@@ -114,7 +115,6 @@ class Vector(object):
         return Vector([v[1] * w[2] - w[1] * v[2],
                 -(v[0] * w[2] - w[0] * v[2]),
                 v[0] * w[1] - w[0] * v[1]])
-
 
     def parallelogram(self, vector):
         return self.cross_product(vector).magnitude()
