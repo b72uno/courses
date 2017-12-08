@@ -140,8 +140,8 @@ class Line(object):
 
                 k1 = l1.constant_term
                 k2 = l2.constant_term
-                B = Decimal(v1[1])
                 A = Decimal(v1[0])
+                B = Decimal(v1[1])
                 C = Decimal(v2[0])
                 D = Decimal(v2[1])
 
@@ -151,7 +151,7 @@ class Line(object):
                 return (x,y)
 
             except ZeroDivisionError:
-                if self == line2:
+                if self == line:
                     return self
                 else:
                     return None
