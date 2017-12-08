@@ -3,6 +3,7 @@ from decimal import Decimal, getcontext
 
 getcontext().prec = 30
 
+
 class Vector(object):
     def __init__(self, coordinates):
         try:
@@ -24,6 +25,8 @@ class Vector(object):
         return self.coordinates == other.coordinates
 
     CANNOT_NORMALIZE_ZERO_VECTOR_MSG = 'Cannot normalize Zero vector'
+    NO_UNIQUE_PARALLEL_COMPONENT_MSG = 'No unique parallel component'
+    NO_UNIQUE_ORTHOGONAL_COMPONENT_MSG = 'No unique orthogonal component'
 
     def sum(self):
         return sum(self.coordinates)
@@ -34,18 +37,14 @@ class Vector(object):
     def add(self, v):
         return Vector([x + y for x,y in zip(self.coordinates, v.coordinates)])
 
-
     def subtract(self, v):
         return Vector([x - y for x,y in zip(self.coordinates, v.coordinates)])
-
 
     def scale(self, s):
         return Vector([x * Decimal(s) for x in self.coordinates])
 
-
     def magnitude(self):
         return Decimal(math.sqrt(sum([x**2 for x in self.coordinates])))
-
 
     def normalized(self):
         try:
@@ -54,10 +53,8 @@ class Vector(object):
         except ZeroDivisionError:
             raise Exception(self.CANNOT_NORMALIZE_ZERO_VECTOR_MSG)
 
-
     def dot(self, v):
         return sum([x * y for x,y in zip(self.coordinates, v.coordinates)])
-
 
     def theta(self, v, in_degrees=False):
         try:
@@ -84,33 +81,52 @@ class Vector(object):
             else:
                 raise e
 
-
     def is_zero(self, tolerance=1e-10):
         return self.magnitude() < tolerance
-
 
     def is_parallel_to(self, v):
         # one is 0 or if they point in the same (0) or opposite (math.pi) directions
         return (self.is_zero() or v.is_zero() or self.theta(v) == 0 or self.theta(v) == math.pi)
 
-
     def is_orthogonal_to(self, v, tolerance=1e-10):
         return abs(self.dot(v)) < tolerance
-
 
     def v_perp(self, basis_v):
         return self.subtract(self.v_parallel(basis_v))
 
-
     def v_parallel(self, basis_v):
         return (basis_v.normalized()).scale(self.dot(basis_v.normalized()))
 
+    def component_parallel_to(self, basis):
+        try:
+            u = basis.normalized()
+            weight = self.dot(u)
+            return u.scale(weight)
+        except Exception as e:
+            if str(e) == self.CANNOT_NORMALIZE_ZERO_VECTOR_MSG:
+                raise Exception(self.NO_UNIQUE_PARALLEL_COMPONENT_MSG)
+            else:
+                raise e
+
+    def component_orthogonal_to(self, basis):
+        try:
+            projection = self.component_parallel_to(basis)
+            return self.subtract(projection)
+        except Exception as e:
+            if str(e) == self.NO_UNIQUE_PARALLEL_COMPONENT_MSG:
+                raise Exception(self.NO_UNIQUE_ORTHOGONAL_COMPONENT_MSG)
+            else:
+                raise e
 
     def cross_product(self, vector):
         v = self.coordinates
         w = vector.coordinates
 
-        assert(len(v) == 3 and len(w) == 3)
+        assert((len(v) == 3 and len(w) == 3) or (len(v) == 2 and len(w) == 2))
+
+        if len(v) == 2:
+            v.append(0)
+            w.append(0)
 
         return Vector([v[1] * w[2] - w[1] * v[2],
                 -(v[0] * w[2] - w[0] * v[2]),
