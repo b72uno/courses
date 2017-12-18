@@ -14,7 +14,7 @@ def color_thresh(img, rgb_thresh=(160,160,160), cmp_op=False):
 
     r,g,b = rgb_thresh
 
-    # Fallback to gt if none specified
+    # Fallback to > if none specified
     if not cmp_op:
         cmp_op = operator.gt
 
@@ -130,20 +130,23 @@ def perception_step(Rover):
     samples = color_thresh_samples(img)
 
     # 3) Apply perspective transform
-    transformed_terrain = perspect_transform(terrain, source, destination)
-    transformed_obstacles = perspect_transform(obstacles, source, destination)
-    transformed_samples = perspect_transform(samples, source, destination)
+    warped_terrain = perspect_transform(terrain, source, destination)
+    warped_obstacles = perspect_transform(obstacles, source, destination)
+    warped_samples = perspect_transform(samples, source, destination)
 
     # 4) Update Rover.vision_image (left side of the screen)
     # e.g. Rover.vision_image[:,:,0]
+    Rover.vision_image[:,:,0] = warped_obstacles * 255
+    Rover.vision_image[:,:,2] = warped_terrain * 255
+    Rover.vision_image[:,:,1] = warped_samples * 255
 
     # 5) Convert map image pixel values to rover-centric coords
-    rover_centric_terrain = rover_coords(transformed_terrain)
-    rover_centric_obstacles = rover_coords(transformed_obstacles)
-    rover_centric_samples = rover_coords(transformed_samples)
+    rover_centric_terrain = rover_coords(warped_terrain)
+    rover_centric_obstacles = rover_coords(warped_obstacles)
+    rover_centric_samples = rover_coords(warped_samples)
 
     # 6) Convert rover-centric pixel values to world coordinates
-    scale = 2*dst_size
+    scale = 2 * dst_size
     worldmap_size = Rover.worldmap.shape
     px2world = lambda xy: pix_to_world(xy[0], xy[1], rover_x, rover_y, rover_yaw, \
                                        worldmap_size[0], scale)
@@ -153,6 +156,34 @@ def perception_step(Rover):
 
     # 7) Update Rover worldmap (to be displayed on the right side of the screen)
     # e.g. Rover.worldmap[obstacle_y_world, obstacle_x_world, 0] += 1
+    Rover.worldmap[world_terrain[1], world_terrain[0], 2] += 10
+    Rover.worldmap[world_obstacles[1], world_obstacles[0], 0] += 1
+
+    # cnts = cv2.findContours(samples.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # cnts = cnts[1]
+
+    # sample_c = []
+    # for c in cnts:
+    #     m = cv2.moments(c)
+    #     try:
+    #         cX = int(m["m10"] / m["m00"])
+    #         cY = int(m["m01"] / m["m00"])
+    #         sample_c.append((cX,cY))
+    #     except ZeroDivisionError:
+    #         pass
+
+    if samples.any():
+        sample_dist, sample_angles = to_polar_coords(rover_centric_samples[0],
+                                                     rover_centric_samples[1])
+        sample_idx = np.argmin(sample_dist)
+        sample_cX = rover_centric_samples[0][sample_idx].astype(np.int)
+        sample_cY = rover_centric_samples[1][sample_idx].astype(np.int)
+
+        Rover.worldmap[sample_cY, sample_cX, 1] = 255
+        Rover.vision_image[:, :, 1] = warped_samples * 255
+
+    else:
+        Rover.vision_image[:, :, 1] = 0
 
     # 8) Convert rover-centric pixel positions to polar coordinates
     # Update Rover pixel distances and angles
@@ -160,8 +191,6 @@ def perception_step(Rover):
     # Rover.nav_angles = rover_centric_angles
     Rover.nav_dists, Rover.nav_angles = to_polar_coords(rover_centric_terrain[0],
                                                         rover_centric_terrain[1])
-
-
 
 
     return Rover
