@@ -31,9 +31,6 @@ def color_thresh(img, rgb_thresh=(160,160,160), cmp_op=False):
 def color_thresh_terrain(img):
     return color_thresh(img, (160, 160, 160))
 
-def color_thresh_obstacles(img):
-    return color_thresh(img, cmp_op=operator.le)
-
 def color_thresh_samples(img):
     hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
 
@@ -100,6 +97,9 @@ def perspect_transform(img, src, dst):
 
     return warped
 
+def is_near_zero(val, eps=0.5):
+    return val < eps or abs(val-360.0) < eps
+
 # Apply the above functions in succession and update the Rover state accordingly
 def perception_step(Rover):
 
@@ -126,7 +126,7 @@ def perception_step(Rover):
 
     # 2) Applying threshold before transform
     terrain = color_thresh_terrain(img)
-    obstacles = color_thresh_obstacles(img)
+    obstacles = color_thresh_terrain(img) ^ 1
     samples = color_thresh_samples(img)
 
     # 3) Apply perspective transform
@@ -155,33 +155,20 @@ def perception_step(Rover):
     world_samples = px2world(rover_centric_samples)
 
     # 7) Update Rover worldmap (to be displayed on the right side of the screen)
-    # e.g. Rover.worldmap[obstacle_y_world, obstacle_x_world, 0] += 1
-    Rover.worldmap[world_terrain[1], world_terrain[0], 2] += 10
-    Rover.worldmap[world_obstacles[1], world_obstacles[0], 0] += 1
-
-    # cnts = cv2.findContours(samples.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    # cnts = cnts[1]
-
-    # sample_c = []
-    # for c in cnts:
-    #     m = cv2.moments(c)
-    #     try:
-    #         cX = int(m["m10"] / m["m00"])
-    #         cY = int(m["m01"] / m["m00"])
-    #         sample_c.append((cX,cY))
-    #     except ZeroDivisionError:
-    #         pass
+    if is_near_zero(Rover.pitch) and is_near_zero(Rover.roll):
+        Rover.worldmap[world_terrain[1], world_terrain[0], 2] += 10
+        Rover.worldmap[world_obstacles[1], world_obstacles[0], 0] += 1
 
     if samples.any():
         sample_dist, sample_angles = to_polar_coords(rover_centric_samples[0],
                                                      rover_centric_samples[1])
-        sample_idx = np.argmin(sample_dist)
-        sample_cX = rover_centric_samples[0][sample_idx].astype(np.int)
-        sample_cY = rover_centric_samples[1][sample_idx].astype(np.int)
+        if sample_dist.any():
+            sample_idx = np.argmin(sample_dist)
+            sample_cX = world_samples[0][sample_idx].astype(np.int)
+            sample_cY = world_samples[1][sample_idx].astype(np.int)
 
-        Rover.worldmap[sample_cY, sample_cX, 1] = 255
-        Rover.vision_image[:, :, 1] = warped_samples * 255
-
+            Rover.worldmap[sample_cY, sample_cX, 1] = 255
+            Rover.vision_image[:, :, 1] = warped_samples * 255
     else:
         Rover.vision_image[:, :, 1] = 0
 
@@ -191,7 +178,6 @@ def perception_step(Rover):
     # Rover.nav_angles = rover_centric_angles
     Rover.nav_dists, Rover.nav_angles = to_polar_coords(rover_centric_terrain[0],
                                                         rover_centric_terrain[1])
-
 
     return Rover
 

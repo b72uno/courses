@@ -61,7 +61,7 @@ class RoverState():
         # when you should stop. Feel free to modify.
         self.stop_forward = 50 # Threshold to initiate stopping
         self.go_forward = 500  # Threshold to go forward again
-        self.max_vel = 2       # Maximum velocity m/s
+        self.max_vel = 6       # Maximum velocity m/s
 
         # Image output from perception step
         # Update this image to display your intermediate analysis steps
@@ -79,6 +79,7 @@ class RoverState():
         self.near_sample = 0       # Will be set to telemetry value data["near_sample"]
         self.picking_up = 0        # Will be set to telemetry value data["picking_up"]
         self.send_pickup = False   # Set to True to trigger rock pickup
+
 
 # Initialize the rover
 Rover = RoverState()

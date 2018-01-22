@@ -30,12 +30,14 @@ def decision_step(Rover):
 
             # If already in "stop" mode then make different decisions
         elif Rover.mode == 'stop':
+
             # If in stop mode but still moving, keep braking
             if Rover.vel > 0.2:
                 Rover.throttle = 0
                 Rover.brake = Rover.brake_set
                 Rover.steer = 0
-                # If not moving (vel < 0.2), then do something else
+
+            # If not moving (vel < 0.2), then do something else
             elif Rover.vel <= 0.2:
                 # Check to see if there is a path forward
                 if len(Rover.nav_angles) < Rover.go_forward:
