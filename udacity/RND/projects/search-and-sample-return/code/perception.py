@@ -97,6 +97,25 @@ def perspect_transform(img, src, dst):
 
     return warped
 
+def mask_image(img):
+    # make the poor rover nearsighted
+    image=np.zeros_like(img)
+    radius=np.int32(img.shape[0] / 2)
+    axes = (radius,radius)
+    angle=0;
+    startAngle=0;
+    endAngle=-180;
+    center_X = np.int32(img.shape[1] / 2)
+    center_Y = np.int32(img.shape[0])
+    center=(center_X, center_Y)
+    color=255
+    mask = cv2.ellipse(image, center, axes, angle, startAngle, endAngle, color, -1)
+
+    masked = cv2.bitwise_and(img, img, mask=mask)
+
+    return masked
+
+
 def is_near_zero(val, eps=0.5):
     return val < eps or abs(val-360.0) < eps
 
@@ -133,6 +152,9 @@ def perception_step(Rover):
     warped_terrain = perspect_transform(terrain, source, destination)
     warped_obstacles = perspect_transform(obstacles, source, destination)
     warped_samples = perspect_transform(samples, source, destination)
+
+    warped_terrain = mask_image(warped_terrain)
+    warped_obstacles = mask_image(warped_obstacles)
 
     # 4) Update Rover.vision_image (left side of the screen)
     # e.g. Rover.vision_image[:,:,0]

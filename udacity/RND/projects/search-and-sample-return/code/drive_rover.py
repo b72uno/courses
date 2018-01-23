@@ -55,6 +55,10 @@ class RoverState():
         self.mode = 'forward'               # Current mode (forward / stop)
         self.throttle_set = 0.2             # Throttle setting when accelerating
         self.brake_set = 10                 # Brake setting when braking
+        self.steering_bias = 8              # Bias the steering
+        self.ddata = 'Empty'                # Data field for debugging
+        self.log_len = 30
+        self.pos_log = [0] * self.log_len   # Keep record of last positions
 
         # The stop forward and go forward fields below represent total count of navigable
         # terrain pixels. This is a very crude form of knowing when you can keep going and
