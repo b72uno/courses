@@ -91,6 +91,12 @@ class LinearSystem(object):
     def compute_triangular_form(self):
         system = deepcopy(self)
 
+        # TODO:
+        # Assumptions for test cases
+        # 1. Swap with topmost row below current row, that has non-zero coefficient
+        # 2. Dont multiply rows by numbers
+        # 3. Only add multiple of a row to rows underneath
+
         return system
 
 

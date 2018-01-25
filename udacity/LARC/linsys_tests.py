@@ -20,6 +20,7 @@ print(s)
 
 
 # [Test cases for row operations START]
+print("Row operation test cases:")
 s.swap_rows(0,1)
 if not (s[0] == p1 and s[1] == p0 and s[2] == p2 and s[3] == p3):
     print('test case 1 failed')
@@ -73,6 +74,7 @@ if not (s[0] == Plane(normal_vector=Vector(['-10','-10','-10']), constant_term='
 # [TEST cases for row operation END]
 
 # [Test cases for triangular form START]
+print("Triangular form test cases:")
 p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
 p2 = Plane(normal_vector=Vector(['0','1','1']), constant_term='2')
 s = LinearSystem([p1,p2])
