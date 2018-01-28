@@ -177,15 +177,15 @@ def perception_step(Rover):
     world_samples = px2world(rover_centric_samples)
 
     # 7) Update Rover worldmap (to be displayed on the right side of the screen)
-    if is_near_zero(Rover.pitch) and is_near_zero(Rover.roll):
+    if is_near_zero(Rover.pitch) and is_near_zero(Rover.roll) and not Rover.picking_up:
         Rover.worldmap[world_terrain[1], world_terrain[0], 2] += 10
         Rover.worldmap[world_obstacles[1], world_obstacles[0], 0] += 1
 
     if samples.any():
-        sample_dist, sample_angles = to_polar_coords(rover_centric_samples[0],
+        Rover.sample_dists, Rover.sample_angles = to_polar_coords(rover_centric_samples[0],
                                                      rover_centric_samples[1])
-        if sample_dist.any():
-            sample_idx = np.argmin(sample_dist)
+        if Rover.sample_dists.any():
+            sample_idx = np.argmin(Rover.sample_dists)
             sample_cX = world_samples[0][sample_idx].astype(np.int)
             sample_cY = world_samples[1][sample_idx].astype(np.int)
 
@@ -200,6 +200,7 @@ def perception_step(Rover):
     # Rover.nav_angles = rover_centric_angles
     Rover.nav_dists, Rover.nav_angles = to_polar_coords(rover_centric_terrain[0],
                                                         rover_centric_terrain[1])
+
 
     return Rover
 

@@ -17,13 +17,25 @@ def decision_step(Rover):
                     # else coast
                     Rover.throttle = 0
                 Rover.brake = 0
-                # Set steering angle to average angle
-                Rover.steer = np.clip(np.mean(Rover.nav_angles*180/np.pi), -15, 15)
-                bias = Rover.steering_bias
-                if abs(Rover.steer) > 10:
-                    bias = 0
-                Rover.steer += bias
 
+                Rover.ddata = Rover.sample_angles.any()
+                # Check if we see any samples
+                if Rover.sample_angles.any():
+                    # If so, bias the steering angle towards the sample
+                    sample_angle = np.clip(np.mean(Rover.sample_angles*180/np.pi), -15, 15) * 0.7
+                    nav_angle = np.clip(np.mean(Rover.nav_angles*180/np.pi), -15, 15) * 0.3
+                    Rover.steer = sample_angle + nav_angle
+
+                else:
+                    # Otherwise set steering angle to average angle
+                    Rover.steer = np.clip(np.mean(Rover.nav_angles*180/np.pi), -15, 15)
+                    bias = Rover.steering_bias
+                    Rover.steer = np.clip(Rover.steer + bias, -15, 15)
+
+                if Rover.near_sample:
+                    Rover.brake = Rover.brake_set
+                    Rover.steer = 0
+                    Rover.mode = 'stop'
 
             # If terrain not navigable, go to stop mode
             elif len(Rover.nav_angles) < Rover.stop_forward:
@@ -35,18 +47,14 @@ def decision_step(Rover):
 
             # Keep a log to check if stuck
             total_time = np.int32(Rover.total_time)
-            idx = (total_time % Rover.log_len) - 1
+            idx = ((total_time + 1) % Rover.log_len)
             prev_idx = idx - 1
             Rover.pos_log[idx] = np.asarray(Rover.pos)
 
-            # Check every 3 seconds if we are moving
-            if total_time % 3 == 0:
-                a = Rover.pos_log[idx]
-                b = Rover.pos_log[prev_idx]
-                z = np.linalg.norm(a - b)
-                Rover.ddata = z
-
-                if z < 0.01 and Rover.mode == 'forward':
+            # Check every n seconds if we are moving
+            if total_time % 2 == 0:
+                get_delta = lambda x,y: np.linalg.norm(Rover.pos_log[x] -  Rover.pos_log[y])
+                if get_delta(idx, prev_idx) < 0.01 and Rover.mode == 'forward':
                     Rover.mode = 'stuck'
                 else:
                     Rover.mode = 'forward'
@@ -71,7 +79,7 @@ def decision_step(Rover):
                 Rover.steer = 0
 
             # If not moving (vel < 0.2), then do something else
-            elif Rover.vel <= 0.2:
+            elif Rover.vel <= 0.2 and not Rover.near_sample:
                 # Check to see if there is a path forward
                 if len(Rover.nav_angles) < Rover.go_forward:
                     Rover.throttle = 0

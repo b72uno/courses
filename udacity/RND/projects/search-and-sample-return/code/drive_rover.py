@@ -49,11 +49,13 @@ class RoverState():
         self.steer = 0                      # Current steering angle
         self.throttle = 0                   # Current throttle value
         self.brake = 0                      # Current brake value
-        self.nav_angles = None              # Angles of navigable terrain pixels
-        self.nav_dists = None               # Distances of navigable terrain pixels
+        self.nav_angles = np.array([])      # Angles of navigable terrain pixels
+        self.nav_dists = np.array([])       # Distances of navigable terrain pixels
+        self.sample_angles = np.array([])   # Angles of sample pixels
+        self.sample_dists = np.array([])    # Distances of sample pixels
         self.ground_truth = ground_truth_3d # Ground truth worldmap
         self.mode = 'forward'               # Current mode (forward / stop)
-        self.throttle_set = 0.2             # Throttle setting when accelerating
+        self.throttle_set = 0.3             # Throttle setting when accelerating
         self.brake_set = 10                 # Brake setting when braking
         self.steering_bias = 8              # Bias the steering
         self.ddata = 'Empty'                # Data field for debugging
@@ -83,6 +85,7 @@ class RoverState():
         self.near_sample = 0       # Will be set to telemetry value data["near_sample"]
         self.picking_up = 0        # Will be set to telemetry value data["picking_up"]
         self.send_pickup = False   # Set to True to trigger rock pickup
+        self.approaching_sample = False
 
 
 # Initialize the rover
