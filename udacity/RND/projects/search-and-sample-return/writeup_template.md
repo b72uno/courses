@@ -1,12 +1,12 @@
 ## Project: Search and Sample Return
 ---
-######Graphic settings used throughout the project
+####### Graphic settings used throughout the project
 Screen resolution: 1680x1050
 Graphics Quality: Good
 Windowed: True
 ---
 
-**The goals / steps performed:**
+###**The goals / steps performed:**
 
 **Training / Calibration**
 - [X] Download the simulator and take data in "Training mode"
