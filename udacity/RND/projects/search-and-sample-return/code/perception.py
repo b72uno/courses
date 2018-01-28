@@ -94,7 +94,6 @@ def pix_to_world(xpix, ypix, xpos, ypos, yaw, world_size, scale):
 def perspect_transform(img, src, dst):
     M = cv2.getPerspectiveTransform(src, dst)
     warped = cv2.warpPerspective(img, M, (img.shape[1], img.shape[0])) # keep same size as input
-
     return warped
 
 def mask_image(img):
