@@ -21,6 +21,11 @@ def decision_step(Rover):
                 Rover.ddata = Rover.sample_angles.any()
                 # Check if we see any samples
                 if Rover.sample_angles.any():
+                    # Slow down
+                    Rover.brake = Rover.brake_set
+                    Rover.brake = 0
+                    Rover.throttle = Rover.throttle_set / 3
+
                     # If so, bias the steering angle towards the sample
                     sample_angle = np.clip(np.mean(Rover.sample_angles*180/np.pi), -15, 15) * 0.7
                     nav_angle = np.clip(np.mean(Rover.nav_angles*180/np.pi), -15, 15) * 0.3
@@ -29,7 +34,16 @@ def decision_step(Rover):
                 else:
                     # Otherwise set steering angle to average angle
                     Rover.steer = np.clip(np.mean(Rover.nav_angles*180/np.pi), -15, 15)
+
                     bias = Rover.steering_bias
+
+                    if Rover.vel > 0.5 and Rover.vel < 1.0:
+                        bias = bias / Rover.vel
+                    if Rover.vel < 2.0:
+                        bias = Rover.steering_bias * 1.5
+                    else:
+                        bias = Rover.steering_bias
+
                     Rover.steer = np.clip(Rover.steer + bias, -15, 15)
 
                 if Rover.near_sample:
