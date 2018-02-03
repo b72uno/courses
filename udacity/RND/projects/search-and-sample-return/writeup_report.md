@@ -420,7 +420,7 @@ Steering - needed an adjustment to steer towards a sample if we see one, and adj
         # Slow down
         Rover.brake = Rover.brake_set
         Rover.brake = 0
-        Rover.throttle = Rover.throttle_set / 
+        Rover.throttle = Rover.throttle_set / 2
 
         # If so, bias the steering angle towards the sample
         sample_angle = np.clip(np.mean(Rover.sample_angles*180/np.pi), -15, 15) * 0.7
