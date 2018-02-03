@@ -55,7 +55,7 @@ class RoverState():
         self.sample_dists = np.array([])    # Distances of sample pixels
         self.ground_truth = ground_truth_3d # Ground truth worldmap
         self.mode = 'forward'               # Current mode (forward / stop)
-        self.throttle_set = 0.3             # Throttle setting when accelerating
+        self.throttle_set = 0.2             # Throttle setting when accelerating
         self.brake_set = 10                 # Brake setting when braking
         self.steering_bias = 4              # Bias the steering
         self.ddata = 'Empty'                # Data field for debugging

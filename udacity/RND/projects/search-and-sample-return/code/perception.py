@@ -190,6 +190,7 @@ def perception_step(Rover):
             Rover.vision_image[:, :, 1] = warped_samples * 255
     else:
         Rover.vision_image[:, :, 1] = 0
+        Rover.sample_dists, Rover.sample_angles = np.array([]), np.array([])
 
     # 8) Convert rover-centric pixel positions to polar coordinates
     # Update Rover pixel distances and angles
