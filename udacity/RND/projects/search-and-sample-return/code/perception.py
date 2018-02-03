@@ -115,9 +115,6 @@ def mask_image(img):
     return masked
 
 
-def is_near_zero(val, eps=0.5):
-    return val < eps or abs(val-360.0) < eps
-
 # Apply the above functions in succession and update the Rover state accordingly
 def perception_step(Rover):
 
@@ -169,13 +166,18 @@ def perception_step(Rover):
     # 6) Convert rover-centric pixel values to world coordinates
     scale = 2 * dst_size
     worldmap_size = Rover.worldmap.shape
-    px2world = lambda xy: pix_to_world(xy[0], xy[1], rover_x, rover_y, rover_yaw, \
-                                       worldmap_size[0], scale)
+
+    def px2world(xy):
+        return pix_to_world(xy[0], xy[1], rover_x, rover_y, rover_yaw, worldmap_size[0], scale)
+
     world_terrain = px2world(rover_centric_terrain)
     world_obstacles = px2world(rover_centric_obstacles)
     world_samples = px2world(rover_centric_samples)
 
     # 7) Update Rover worldmap (to be displayed on the right side of the screen)
+    def is_near_zero(val, eps=0.5):
+        return val < eps or abs(val-360.0) < eps
+
     if is_near_zero(Rover.pitch) and is_near_zero(Rover.roll) and not Rover.picking_up:
         Rover.worldmap[world_terrain[1], world_terrain[0], 2] += 10
         Rover.worldmap[world_obstacles[1], world_obstacles[0], 0] += 1

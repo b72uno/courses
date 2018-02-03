@@ -5,6 +5,7 @@ def decision_step(Rover):
     # Check for vision
     if Rover.nav_angles is not None:
 
+        # Check for Rover.mode status
         if Rover.mode == 'forward':
 
             # Check the extent of navigable terrain
@@ -18,7 +19,9 @@ def decision_step(Rover):
                     Rover.throttle = 0
                 Rover.brake = 0
 
-                Rover.ddata = Rover.sample_angles.any()
+                # For debugging to check if sample in sight
+                # Rover.ddata = Rover.sample_angles.any()
+
                 # Check if we see any samples
                 if Rover.sample_angles.any():
                     # Slow down
@@ -34,6 +37,7 @@ def decision_step(Rover):
                 else:
                     # Otherwise set steering angle to average angle
                     Rover.steer = np.clip(np.mean(Rover.nav_angles*180/np.pi), -15, 15)
+                    Rover.throttle = Rover.throttle_set
 
                     bias = Rover.steering_bias
 
@@ -46,6 +50,7 @@ def decision_step(Rover):
 
                     Rover.steer = np.clip(Rover.steer + bias, -15, 15)
 
+                # If we are near a sample, stop
                 if Rover.near_sample:
                     Rover.brake = Rover.brake_set
                     Rover.steer = 0
@@ -67,8 +72,8 @@ def decision_step(Rover):
 
             # Check every n seconds if we are moving
             if total_time % 2 == 0:
-                get_delta = lambda x,y: np.linalg.norm(Rover.pos_log[x] -  Rover.pos_log[y])
-                if get_delta(idx, prev_idx) < 0.01 and Rover.mode == 'forward':
+                if np.linalg.norm(Rover.pos_log[idx]-
+                                  Rover.pos_log[prev_idx]) < 0.01 and Rover.mode == 'forward':
                     Rover.mode = 'stuck'
                 else:
                     Rover.mode = 'forward'
@@ -83,7 +88,7 @@ def decision_step(Rover):
             # resume trying to go forward
             Rover.mode = 'forward'
 
-            # If already in "stop" mode then make different decisions
+        # If already in "stop" mode then make different decisions
         elif Rover.mode == 'stop':
 
             # If in stop mode but still moving, keep braking
