@@ -39,6 +39,7 @@ def decision_step(Rover):
                     Rover.steer = np.clip(np.mean(Rover.nav_angles*180/np.pi), -15, 15)
                     Rover.throttle = Rover.throttle_set
 
+                    # Bias the steering (attempt at wall crawling)
                     bias = Rover.steering_bias
 
                     if Rover.vel > 0.5 and Rover.vel < 1.0:
@@ -97,7 +98,7 @@ def decision_step(Rover):
                 Rover.brake = Rover.brake_set
                 Rover.steer = 0
 
-            # If not moving (vel < 0.2), then do something else
+            # If not moving (vel < 0.2) and not near a sample, then do something else
             elif Rover.vel <= 0.2 and not Rover.near_sample:
                 # Check to see if there is a path forward
                 if len(Rover.nav_angles) < Rover.go_forward:

@@ -171,7 +171,7 @@ Output file from recorded data:
 
 ### Autonomous Navigation and Mapping
 
-#### 1. Fill in the `perception_step()` (at the bottom of the `perception.py` script) and `decision_step()` (in `decision.py`) functions in the autonomous mapping scripts and an explanation is provided in the writeup of how and why these functions were modified as they were.
+#### - [X] 1. Fill in the `perception_step()` (at the bottom of the `perception.py` script) and `decision_step()` (in `decision.py`) functions in the autonomous mapping scripts and an explanation is provided in the writeup of how and why these functions were modified as they were.
 
 ##### `perception.py`
 
@@ -212,6 +212,32 @@ def perception_step(Rover):
     warped_obstacles = perspect_transform(obstacles, source, destination)
     warped_samples = perspect_transform(samples, source, destination)
 
+```
+
+To improve the fidelity, I limited the range of obstacles and terrain by masking the perceived image with an ellipse-like mask. Could be a better way to do this. Defined a helper function in `perception.py`:
+
+```python
+def mask_image(img):
+    # make the poor rover nearsighted
+    image = np.zeros_like(img)
+    radius = np.int32(img.shape[0] / 2)
+    axes = (radius,radius)
+    angle = 0;
+    startAngle = 0;
+    endAngle = -180;
+    center_X = np.int32(img.shape[1] / 2)
+    center_Y = np.int32(img.shape[0])
+    center = (center_X, center_Y)
+    color = 255
+    mask = cv2.ellipse(image, center, axes, angle, startAngle, endAngle, color, -1)
+
+    masked = cv2.bitwise_and(img, img, mask=mask)
+
+    return masked
+```
+which is then used to mask the warped images of terrain and obstacles.
+
+```python
     warped_terrain = mask_image(warped_terrain)
     warped_obstacles = mask_image(warped_obstacles)
 
@@ -356,8 +382,8 @@ def decision_step(Rover):
         Rover.brake = 0
 ```
 
-As the Rover was getting stuck frequently, felt like it needed to be remedied.
-To check whether Rover is stuck, I decided to check its recent positions. First step - adding additional attributes to `RoverState` class:
+First, as the Rover was getting stuck frequently, we needed a way to get unstuck.
+To check whether Rover is stuck, I decided to check its recent positions. Additional attributes to `RoverState` class:
 
 ```python
 class RoverState():
@@ -366,10 +392,27 @@ class RoverState():
         self.log_len = 30
         self.pos_log = [0] * self.log_len   # Keep record of last positions
         ...
-```                     
+```
 
+In 'forward' mode keep a log of positions and every n seconds check the distance traveled. If it is below threshold, enter 'stuck' mode.
 
+```python
+        # Keep a log to check if stuck
+        total_time = np.int32(Rover.total_time)
+        idx = ((total_time + 1) % Rover.log_len)
+        prev_idx = idx - 1
+        Rover.pos_log[idx] = np.asarray(Rover.pos)
 
+        # Check every n seconds if we are moving
+        if total_time % 2 == 0:
+        if np.linalg.norm(Rover.pos_log[idx]-
+                                Rover.pos_log[prev_idx]) < 0.01 and Rover.mode == 'forward':
+                Rover.mode = 'stuck'
+        else:
+                Rover.mode = 'forward'
+```
+
+Once in 'stuck' mode, set the steering angle fully locked to the right (arbitrary), which effectively results in a slight nudge towards right. Resume forward mode, and see if that helped. If not, it will repeat the nudge. More often than not, given a bit of time, this gets the rover unstuck.
 
 ```python
         elif Rover.mode == 'stuck':
@@ -381,12 +424,63 @@ class RoverState():
                 Rover.steer = -15 # Could be more clever way about which way to turn
                 # resume trying to go forward
                 Rover.mode = 'forward'
+```
 
-```                     
-
-
+Steering - needed an adjustment to steer towards a sample if we see one, and adjust throttle to be able to slow down in time (more often than not).
 
 ```python
+        # Check if we see any samples
+        if Rover.sample_angles.any():
+        # Slow down
+        Rover.brake = Rover.brake_set
+        Rover.brake = 0
+        Rover.throttle = Rover.throttle_set / 3
+
+        # If so, bias the steering angle towards the sample
+        sample_angle = np.clip(np.mean(Rover.sample_angles*180/np.pi), -15, 15) * 0.7
+        nav_angle = np.clip(np.mean(Rover.nav_angles*180/np.pi), -15, 15) * 0.3
+        Rover.steer = sample_angle + nav_angle
+```
+otherwise, steer normally. My attempt at wall crawling was not that successful, probably with more trial and error a better way could be found. Note that I have added a `steering_bias` to `RoverState` class.
+
+```python
+        else:
+                # Otherwise set steering angle to average angle
+                Rover.steer = np.clip(np.mean(Rover.nav_angles*180/np.pi), -15, 15)
+                Rover.throttle = Rover.throttle_set
+
+                # Bias the steering (attempt at wall crawling)
+                bias = Rover.steering_bias
+
+                if Rover.vel > 0.5 and Rover.vel < 1.0:
+                bias = bias / Rover.vel
+                if Rover.vel < 2.0:
+                bias = Rover.steering_bias * 1.5
+                else:
+                bias = Rover.steering_bias
+
+                Rover.steer = np.clip(Rover.steer + bias, -15, 15)
+```
+
+The final modification to 'forward' mode was to stop, if Rover is near a sample. This, along with a modification below, allows the rover to initiate the pickup already defined in `driver_rover.py`
+
+```python
+        # If we are near a sample, stop
+        if Rover.near_sample:
+                Rover.brake = Rover.brake_set
+                Rover.steer = 0
+                Rover.mode = 'stop'
+```
+
+An adjustment to 'stop' mode was needed as well - do not switch to 'forward' mode if we are near a sample:
+
+```python
+
+        elif Rover.mode == 'stop':
+        ...
+                # If not moving (vel < 0.2) and not near a sample, then do something else
+                elif Rover.vel <= 0.2 and not Rover.near_sample:
+        ...
 ```
 
 #### 2. Launching in autonomous mode your rover can navigate and map autonomously.  Explain your results and how you might improve them in your writeup.  
@@ -403,12 +497,29 @@ Graphics Quality: Good
 
 Windowed: True
 
-FPS output to terminal by `drive_rover.py`: 19
+FPS output to terminal by `drive_rover.py`: 17-21
 
 ---
 
 Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
 
+My approach was to follow the optimizing metrics (at least some of them) -
+- Optimizing fidelity - visible (and consequently mapped) range for terrain and obstacles is clipped, and no mapping is done during pick-up and when roll or yaw angles are above threshold.
+- Optimizing Time Tip - moving faster was the only thing done, i.e. set_throttle raised from 0.2 to 0.3
+- Optimizing % mapped - nothing specific implemented for this
+- Optimizing for finding all rocks - Rover steering biased towards one wall, to make it wall-crawling -ish.
+
+
+Improvement ideas:
+- Iterate on wall-crawling, probably a better solution can be found
+- Rover has no clue which areas it has visited before.
+- Unstuck mode is primitive, could be smarter. There are cases where the rover cannot get unstuck with this approach alone.
+- If Rover is crawling the wall on the left and it sees a sample on the right and goes to pick it up, afterwards it will most likely rotate to the right again, and effectively leave an area unexplored until it returns again at that point by crawling the left wall. 
+- Doesn't return to the starting point after sample pick-up, has no idea where the said point is. 
+
+
+```python
+```
 
 
 ![alt text][image3]
