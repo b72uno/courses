@@ -42,9 +42,9 @@ def decision_step(Rover):
                     # Bias the steering (attempt at wall crawling)
                     bias = Rover.steering_bias
 
-                    if Rover.vel > 0.5 and Rover.vel < 1.0:
+                    if Rover.vel > 0.7 and Rover.vel < 1.0:
                         bias = bias / Rover.vel
-                    if Rover.vel < 2.0:
+                    if Rover.vel < 2.0 and Rover.vel >= 1.0:
                         bias = Rover.steering_bias * 1.5
                     else:
                         bias = Rover.steering_bias

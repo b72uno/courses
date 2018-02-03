@@ -1,8 +1,6 @@
 ## Project: Search and Sample Return
----
 
-
-###**The goals / steps performed:**
+### **The goals / steps performed:**
 
 **Training / Calibration**
 - [X] Download the simulator and take data in "Training mode"
@@ -19,22 +17,15 @@
 - [X] Iterate on your perception and decision function until your rover does a reasonable (need to define metric) job of navigating and mapping.  
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/916/view) Points
-### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
-
----
 ### Writeup / README
 
-#### 1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  
-
-You're reading it!
-
 ### Notebook Analysis
-#### 1. Run the functions provided in the notebook on test images (first with the test data provided, next on data you have recorded). Add/modify functions to allow for color selection of obstacles and rock samples.
+####  [X] 1. Run the functions provided in the notebook on test images (first with the test data provided, next on data you have recorded). Add/modify functions to allow for color selection of obstacles and rock samples.
 
-The first thing I modified was Color Thresholding function - it now accepts an additional argument, which specifies an operator for the threshold input. 
+Initially I modified color_thresh function, to be able to input a comparison operator, i.e. getting selection of terrain and obstacles differently. I ended up not using the operator argument for this submission, but it allows for more flexibility should I come back to try to improve the solution. Arguably this is writing code that is not needed.
 
 ```python
- def color_thresh(img, rgb_thresh=(160, 160, 160), cmp_op=False):
+ def color_thresh(img, rgb_thresh=(160, 160, 160), cmp_op=operator.gt):
     # Single channel of img shaped zeros
     color_select = np.zeros_like(img[:,:,0])
     
@@ -44,10 +35,6 @@ The first thing I modified was Color Thresholding function - it now accepts an a
     img_b = img[:,:,2]
     
     r, g, b = rgb_thresh
-    
-    # Default to above thresh
-    if not cmp_op:
-        cmp_op = operator.gt
     
     # Compare each pix to thresh
     thresh = (cmp_op(img_r, r) \
@@ -83,11 +70,11 @@ Applying the color thresholding functions to a sample image, seems to output an 
 ![color_thresholding](./misc/color_thresholding.png)
 
 
-#### 1. Populate the `process_image()` function with the appropriate analysis steps to map pixels identifying navigable terrain, obstacles and rock samples into a worldmap.  Run `process_image()` on your test data using the `moviepy` functions provided to create video output of your result. 
+#### [X] 2. Populate the `process_image()` function with the appropriate analysis steps to map pixels identifying navigable terrain, obstacles and rock samples into a worldmap.  Run `process_image()` on your test data using the `moviepy` functions provided to create video output of your result. 
 
 The `process_image()` function I modified accordingly:
 - [X] 1) Define source and destination points for perspective transform. These were known from the lessons earlier.
- ```python
+```python
  # Define a calibration box in source (actual) and destination (desired) coordinates
     # The source and destination points are defined to warp the image to a grid
     # where each 10x10 pixel square represents 1 square meter
@@ -104,14 +91,14 @@ The `process_image()` function I modified accordingly:
                   [image.shape[1]/2 + dst_size, image.shape[0] - 2*dst_size - bottom_offset], 
                   [image.shape[1]/2 - dst_size, image.shape[0] - 2*dst_size - bottom_offset],
                   ])
- ```
- - [X] 2) Apply color threshold - I chose to do thresholding first, perspective transform afterwards.
+```
+- [X] 2) Apply color threshold - I chose to do thresholding first, perspective transform afterwards.
 ```python
     terrain = color_thresh_terrain(img)
     obstacles = color_thresh_obstacles(img)
     samples = color_thresh_samples(img)
 ```
-- [X] 3) Apply perspective transform using the functions defined earlier.
+- [X] 3) Apply perspective transform using the functions defined earlier in the lesson.
 
 ```python
     warped_terrain = perspect_transform(terrain, source, destination)
@@ -120,12 +107,14 @@ The `process_image()` function I modified accordingly:
 ```
 
 - [X] 4) Converting thresholded image pixel values to rover-centric coords.
+
 ```python
     rover_centric_terrain = rover_coords(warped_terrain)
     rover_centric_obstacles = rover_coords(warped_obstacles)
     rover_centric_samples = rover_coords(warped_samples)
     
 ```
+
 - [X] 5) Converting rover-centric pixel values to world coordinates. Defined a helper function, dry and all.
 
 ```python
@@ -155,7 +144,7 @@ The `process_image()` function I modified accordingly:
         
         data.worldmap[np.int_(sample_cY), np.int_(sample_cX), 1] = 255
 ```
-- [X] 7) Make a mosaic image. The only code I changed for this step was adding rover "vision" image to the lower right side of the screen:
+- [X] 7) Make a mosaic image. The only thing I changed in provided code for this step was adding rover "vision" image to the lower right side of the screen as follows:
 
 ```python
     img_x = img.shape[0]
@@ -167,11 +156,11 @@ The `process_image()` function I modified accordingly:
 
 Output file from recorded data:
 
-![notebook-rover](./output/test_mapping.mp4)
+![notebook-rover](./misc/notebook-rover.gif)
 
-### Autonomous Navigation and Mapping
+## Autonomous Navigation and Mapping
 
-#### - [X] 1. Fill in the `perception_step()` (at the bottom of the `perception.py` script) and `decision_step()` (in `decision.py`) functions in the autonomous mapping scripts and an explanation is provided in the writeup of how and why these functions were modified as they were.
+#### [X] 1. Fill in the `perception_step()` (at the bottom of the `perception.py` script) and `decision_step()` (in `decision.py`) functions in the autonomous mapping scripts and an explanation is provided in the writeup of how and why these functions were modified as they were.
 
 ##### `perception.py`
 
@@ -303,7 +292,7 @@ Additionally, I modified `RoverState()` class to record `sample_dists` and `samp
     return Rover
 ```
 
-*Note, that the color thresholding function was changed the same way as in the notebook. The operator argument  (and consequently import statement) could be removed, as is not actually being used in the final result, but as I initially played around with thresholding the obstacles, not simply inverting the terrain, the function definition stuck. Arguably this could be cleaned up. The top part of perception.py up to `rover_coords()` function is as follows:*
+*Note, that the color thresholding function was changed the same way as in the notebook. The top part of perception.py up to `rover_coords()` function is as follows:*
 
 ```python
 import numpy as np
@@ -312,7 +301,7 @@ import operator
 
 # Identify pixels above the threhold
 # > 160 ok for ground pixels only
-def color_thresh(img, rgb_thresh=(160,160,160), cmp_op=False):
+def color_thresh(img, rgb_thresh=(160,160,160), cmp_op=operator.gt):
     # Zeros size of img, but single channel
     color_select = np.zeros_like(img[:,:,0])
 
@@ -321,10 +310,6 @@ def color_thresh(img, rgb_thresh=(160,160,160), cmp_op=False):
     img_b = img[:,:,2]
 
     r,g,b = rgb_thresh
-
-    # Fallback to > if none specified
-    if not cmp_op:
-        cmp_op = operator.gt
 
     # Require each px to be above thresh val
     above_thresh = (cmp_op(img_r, r) \
@@ -412,7 +397,7 @@ In 'forward' mode keep a log of positions and every n seconds check the distance
                 Rover.mode = 'forward'
 ```
 
-Once in 'stuck' mode, set the steering angle fully locked to the right (arbitrary), which effectively results in a slight nudge towards right. Resume forward mode, and see if that helped. If not, it will repeat the nudge. More often than not, given a bit of time, this gets the rover unstuck.
+Once in 'stuck' mode, set the steering angle fully locked to the right (arbitrary), which effectively results in a slight nudge towards right. Resume forward mode, and see if that helped. If not, it will keep entering 'stuck' mode and repeating the nudge. More often than not, given a bit of time, this will get the rover unstuck.
 
 ```python
         elif Rover.mode == 'stuck':
@@ -426,7 +411,7 @@ Once in 'stuck' mode, set the steering angle fully locked to the right (arbitrar
                 Rover.mode = 'forward'
 ```
 
-Steering - needed an adjustment to steer towards a sample if we see one, and adjust throttle to be able to slow down in time (more often than not).
+Steering - needed an adjustment to steer towards a sample if we see one, and adjust throttle to be able to slow down in time (again, more often than not).
 
 ```python
         # Check if we see any samples
@@ -441,7 +426,7 @@ Steering - needed an adjustment to steer towards a sample if we see one, and adj
         nav_angle = np.clip(np.mean(Rover.nav_angles*180/np.pi), -15, 15) * 0.3
         Rover.steer = sample_angle + nav_angle
 ```
-otherwise, steer normally. My attempt at wall crawling was not that successful, probably with more trial and error a better way could be found. Note that I have added a `steering_bias` to `RoverState` class.
+otherwise, steer normally. My attempt at wall crawling was not that successful, probably with more trial and error a better way could be found. Note that I have added a `steering_bias` attribute to `RoverState` class.
 
 ```python
         else:
@@ -452,9 +437,9 @@ otherwise, steer normally. My attempt at wall crawling was not that successful, 
                 # Bias the steering (attempt at wall crawling)
                 bias = Rover.steering_bias
 
-                if Rover.vel > 0.5 and Rover.vel < 1.0:
+                if Rover.vel > 0.7 and Rover.vel < 1.0:
                 bias = bias / Rover.vel
-                if Rover.vel < 2.0:
+                if Rover.vel < 2.0 and Rover.vel >= 1.0:
                 bias = Rover.steering_bias * 1.5
                 else:
                 bias = Rover.steering_bias
@@ -462,7 +447,7 @@ otherwise, steer normally. My attempt at wall crawling was not that successful, 
                 Rover.steer = np.clip(Rover.steer + bias, -15, 15)
 ```
 
-The final modification to 'forward' mode was to stop, if Rover is near a sample. This, along with a modification below, allows the rover to initiate the pickup already defined in `driver_rover.py`
+The final modification to 'forward' mode was to stop if Rover is near a sample. This, along with a modification below, allows the rover to initiate the pickup already defined in `driver_rover.py`
 
 ```python
         # If we are near a sample, stop
@@ -489,7 +474,7 @@ An adjustment to 'stop' mode was needed as well - do not switch to 'forward' mod
 
 ---
 
-###### Graphic settings used throughout the project
+###### Graphic settings 
 
 Screen resolution: 1680x1050
 
@@ -499,29 +484,34 @@ Windowed: True
 
 FPS output to terminal by `drive_rover.py`: 17-21
 
----
+----
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
-
-My approach was to follow the optimizing metrics (at least some of them) -
-- Optimizing fidelity - visible (and consequently mapped) range for terrain and obstacles is clipped, and no mapping is done during pick-up and when roll or yaw angles are above threshold.
-- Optimizing Time Tip - moving faster was the only thing done, i.e. set_throttle raised from 0.2 to 0.3
-- Optimizing % mapped - nothing specific implemented for this
+My approach was to follow the optimizing metrics provided (at least some of them) -
+- Optimizing fidelity - visible (and consequently mapped) range for terrain and obstacles is clipped 
+![clipped_vision](./misc/clipped_vision.png)
+- Optimizing fidelity - No mapping is done during pick-up and when roll or yaw angles are above threshold.
+- Optimizing Time Tip - moving faster, set_throttle raised from 0.2 to 0.3
 - Optimizing for finding all rocks - Rover steering biased towards one wall, to make it wall-crawling -ish.
 
 
-Improvement ideas:
-- Iterate on wall-crawling, probably a better solution can be found
+The end result is a basic solution, but more often than not it passes the requirements for a passing submission, given some time (> 400 s)
+
+![varied results](./misc/293.png)
+![varied results](./misc/333.png)
+![varied results](./misc/350.png)
+![varied results](./misc/413.png)
+![varied results](./misc/474.png)
+![varied results](./misc/508.png)
+
+There are some cases when it can get stuck for a long periods of time between rocks, or spend some time running in circles in larger areas. To avoid those would require further improvements.
+
+![stuck](./misc/stuck.png)
+
+----
+
+Improvement areas:
+- Wall-crawling should be improved, probably a better, more consistent solution can be found via trial and error.
+- Unstuck mode is primitive, could be smarter. There are cases where the rover cannot get unstuck with this approach alone, or at least it takes significant amount of time for the Rover to get unstuck.
+- If Rover is crawling the wall on the left and it sees a sample on the right and goes to pick it up, afterwards it will most likely rotate to the right again, and effectively leave an area unexplored until it returns again at that point by crawling the left wall. Could either ignore the samples on the right side, or turn the opposite direction after sample pickup.
 - Rover has no clue which areas it has visited before.
-- Unstuck mode is primitive, could be smarter. There are cases where the rover cannot get unstuck with this approach alone.
-- If Rover is crawling the wall on the left and it sees a sample on the right and goes to pick it up, afterwards it will most likely rotate to the right again, and effectively leave an area unexplored until it returns again at that point by crawling the left wall. 
 - Doesn't return to the starting point after sample pick-up, has no idea where the said point is. 
-
-
-```python
-```
-
-
-![alt text][image3]
-
-

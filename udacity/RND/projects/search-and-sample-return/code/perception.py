@@ -4,7 +4,7 @@ import operator
 
 # Identify pixels above the threhold
 # > 160 ok for ground pixels only
-def color_thresh(img, rgb_thresh=(160,160,160), cmp_op=False):
+def color_thresh(img, rgb_thresh=(160,160,160), cmp_op=operator.gt):
     # Zeros size of img, but single channel
     color_select = np.zeros_like(img[:,:,0])
 
@@ -13,10 +13,6 @@ def color_thresh(img, rgb_thresh=(160,160,160), cmp_op=False):
     img_b = img[:,:,2]
 
     r,g,b = rgb_thresh
-
-    # Fallback to > if none specified
-    if not cmp_op:
-        cmp_op = operator.gt
 
     # Require each px to be above thresh val
     above_thresh = (cmp_op(img_r, r) \
