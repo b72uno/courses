@@ -280,6 +280,7 @@ Additionally, I modified `RoverState()` class to record `sample_dists` and `samp
             Rover.vision_image[:, :, 1] = warped_samples * 255
     else:
         Rover.vision_image[:, :, 1] = 0
+        Rover.sample_dists, Rover.sample_angles = np.array([]), np.array([])
 
     # 8) Convert rover-centric pixel positions to polar coordinates
     # Update Rover pixel distances and angles
@@ -419,7 +420,7 @@ Steering - needed an adjustment to steer towards a sample if we see one, and adj
         # Slow down
         Rover.brake = Rover.brake_set
         Rover.brake = 0
-        Rover.throttle = Rover.throttle_set / 3
+        Rover.throttle = Rover.throttle_set / 
 
         # If so, bias the steering angle towards the sample
         sample_angle = np.clip(np.mean(Rover.sample_angles*180/np.pi), -15, 15) * 0.7
@@ -490,7 +491,6 @@ My approach was to follow the optimizing metrics provided (at least some of them
 - Optimizing fidelity - visible (and consequently mapped) range for terrain and obstacles is clipped 
 ![clipped_vision](./misc/clipped_vision.png)
 - Optimizing fidelity - No mapping is done during pick-up and when roll or yaw angles are above threshold.
-- Optimizing Time Tip - moving faster, set_throttle raised from 0.2 to 0.3
 - Optimizing for finding all rocks - Rover steering biased towards one wall, to make it wall-crawling -ish.
 
 
@@ -515,3 +515,4 @@ Improvement areas:
 - If Rover is crawling the wall on the left and it sees a sample on the right and goes to pick it up, afterwards it will most likely rotate to the right again, and effectively leave an area unexplored until it returns again at that point by crawling the left wall. Could either ignore the samples on the right side, or turn the opposite direction after sample pickup.
 - Rover has no clue which areas it has visited before.
 - Doesn't return to the starting point after sample pick-up, has no idea where the said point is. 
+
