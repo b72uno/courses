@@ -210,8 +210,88 @@ def TF_matrix(alpha, a, d, q):
     ])
     
 ```
-
 Each row in DH parameter table corresponds to the transformation from frame {i} to frame {i+1}.  
+One can use sympy's simplify() to obtain simplified individual transform matrices about each joint.
+
+```
+T0_1 = simplify(TF_matrix(alpha0, a0, d1, q1).subs(DH_table))
+...
+```
+
+$$
+
+^{0}_{1}T = \left[
+\begin{matrix}
+cos(q_1) & -sin(q_1) & 0 & 0 \\
+sin(q_2) & cos(q_2) & 0 & 0 \\
+0 & 0 & 1 & 0.75 \\
+0 & 0 & 0 & 1 \\
+\end{matrix}
+\right] 
+
+{}^{1}_{2}T = \left[
+\begin{matrix}
+sin(q_2) & cos(q_2) & 0 & 0.35 \\
+0 & 0 & 1 & 0 \\
+cos(q_2) & -sin(q_2) & 0 & 0 \\
+0 & 0 & 0 & 1 \\
+\end{matrix}
+\right] 
+
+\\
+
+^{2}_{3}T = \left[
+\begin{matrix}
+cos(q_3) & -sin(q_3) & 0 & 1.25 \\
+sin(q_3) & cos(q_3) & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1 \\
+\end{matrix}
+\right] 
+
+{}^{3}_{4}T = \left[
+\begin{matrix}
+cos(q_4) & -sin(q_4) & 0 & -0.054 \\
+0 & 0 & 1 & 1.5 \\
+-sin(q_4) & -cos(q_4) & 0 & 0 \\
+0 & 0 & 0 & 1 \\
+\end{matrix}
+\right] 
+
+\\
+
+^{4}_{5}T = \left[
+\begin{matrix}
+cos(q_5) & -sin(q_5) & 0 & 0 \\
+0 & 0 & -1 & 0 \\
+sin(q_5) & cos(q_5) & 0 & 0 \\
+0 & 0 & 0 & 1 \\
+\end{matrix}
+\right] 
+
+{}^{5}_{6}T = \left[
+\begin{matrix}
+cos(q_6) & -sin(q_6) & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+-sin(q_6) & -cos(q_6) & 0 & 0 \\
+0 & 0 & 0 & 1 \\
+\end{matrix}
+\right] 
+
+\\
+
+^{6}_{G}T = \left[
+\begin{matrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0.303 \\
+0 & 0 & 0 & 1 \\
+\end{matrix}
+\right] 
+
+$$
+
+However, `simplify()` can be unnecessarily slow, so it is not used in the final implementation.
 
 ```
 # Create individual transformation matrices
@@ -224,7 +304,11 @@ T5_6 = TF_matrix(alpha5, a5, d6, q6).subs(DH_table)
 T6_G = TF_matrix(alpha6, a6, d7, q7).subs(DH_table)
 ```
 
+Homogenous transformation matrix from base_link to gripper_link can be obtained as follows:
+
 $$ ^{0}_{N}T = ^{0}_{1}T ^{1}_{2}T^{2}_{3}T...^{N-1}_{N}T $$
+
+<sub> The resultant matrix is significantly more-involved and rather unsightly, hence not displayed here. </sub>
 
 ```
 T0_G = T0_1 * T1_2 * T3_4 * T4_5 * T5_6 * T6_G
@@ -245,7 +329,6 @@ $$
 \end{matrix}
 \right]
 $$  
-
 
 ---
 
@@ -401,11 +484,14 @@ R3_6 = inv(R0_3) * Rrpy
 ```
 
 For $\theta_4$, $\theta_5$, and $\theta_6$ following the process outlined in [Euler Angles from a Rotation Matrix](https://classroom.udacity.com/nanodegrees/nd209/parts/c199593e-1e9a-4830-8e29-2c86f70f489e/modules/8855de3f-2897-46c3-a805-628b5ecf045b/lessons/87c52cd9-09ba-4414-bc30-24ae18277d24/concepts/a124f98b-1ed5-45f5-b8eb-6c40958c1a6b)
+
+
 $$
 \beta = atan2(y,x) = atan2(-r_{31}, \sqrt{-r_{11}*r_{11}+r_{21}*r_{21}}) \\
 \gamma = atan2(r_{32}, r_{33}) \\
 \alpha = atan2(r_{21},r_{11}) \\
 $$
+
 
 ```
 theta4 = atan2(R3_6[2,2] -R3_6[0,2])
