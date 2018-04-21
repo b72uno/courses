@@ -158,7 +158,7 @@ G | 0 | 0 | 0.303 | 0
 
 Using Python Sympy library to create individual transformation matrices
 
-````
+```
 from sympy import symbols, cos, sin, pi, simplify, sqrt, atan2
 from sympy.matrices import Matrix
 from numpy import array
@@ -183,7 +183,7 @@ DH_table = {alpha0:      0, a0:     0, d1: 0.75, q1:        q1
             alpha4: 90*dtr, a4:     0, d5:    0, q5:        q5
             alpha5:-90*dtr, a5:     0, d6:    0, q6:        q6
             alpha6:      0, a6:     0, d7:0.303, q7:        0}
-````
+```
 
 The homogeneous transform from frame *i-1* to *i* is constructed as a sequence of four basic transformations, two rotations and two translations as follows:
 
@@ -218,7 +218,6 @@ T0_1 = simplify(TF_matrix(alpha0, a0, d1, q1).subs(DH_table))
 ```
 
 $$
-
 ^{0}_{1}T = \left[
 \begin{matrix}
 cos(q_1) & -sin(q_1) & 0 & 0 \\
@@ -293,7 +292,6 @@ $$
 However, `simplify()` can be unnecessarily slow, so it is not used in the final implementation.
 
 ```
-# Create individual transformation matrices
 T0_1 = TF_matrix(alpha0, a0, d1, q1).subs(DH_table)
 T1_2 = TF_matrix(alpha1, a1, d2, q2).subs(DH_table)
 T2_3 = TF_matrix(alpha2, a2, d3, q3).subs(DH_table)
@@ -309,55 +307,6 @@ $$ ^{0}_{N}T = ^{0}_{1}T ^{1}_{2}T^{2}_{3}T...^{N-1}_{N}T $$
 
 <sub> The resultant matrix is significantly more-involved and rather unsightly, hence not displayed here. </sub>
 
-To obtain the general homogenous transform from base_link to gripper_link, from which a transformation matrix can be derived using only the position and orientation of the gripper_link, following [Tait-Brian ZYX rotation convention](https://en.wikipedia.org/wiki/Davenport_chained_rotations) we have to multiply the three elementary rotation matrices in order yaw, pitch and roll:
-
-$$
-R_x(\phi) = Roll(\phi) = 
-\left[
-\begin{matrix}
-        1 & 0 & 0 \\
-        0 & cos\phi & -sin\phi \\
-        0 & sin\phi & cos\phi \\
-\end{matrix}
-\right]
-
-\\
-R_y(\theta) = Pitch(\theta) = 
-\left[
-\begin{matrix}
-        cos\theta & 0 & sin\theta \\
-        0 & 1 & 0 \\
-        -sin\theta & 0 & cos\theta \\
-\end{matrix}
-\right]
-
-\\
-
-R_z(\psi) = Yaw(\psi) = 
-\left[
-\begin{matrix}
-        cos\psi & -sin\psi & 0\\
-        sin\psi & cos\psi & 0 \\
-        0 & 0 & 1 \\
-\end{matrix}
-\right]
-$$  
-
-Yielding a matrix
-
-$$
-R_x(\psi) = yaw pitch roll Z X Y= 
-\left[
-\begin{matrix}
-        cos\psi & -sin\psi & 0\\
-        sin\psi & cos\psi & 0 \\
-        0 & 0 & 1 \\
-\end{matrix}
-\right]
-$$
-
-
-where x,y and z constitutes the position of the end-effector, and roll, pitch and yaw gives us the rotation values. 
 
 ```
 T0_G = T0_1 * T1_2 * T3_4 * T4_5 * T5_6 * T6_G
@@ -526,11 +475,73 @@ Substitute values calculated for joints 1 to 3 in their respective individual ro
 
 ```
 R3 = T0_3.evalf(subs={theta1:p1, theta2:p2, theta3:p3})
-R3_6 = inv(R0_3) * Rrpy
+R3_6 = R0_3.inv("LU") * Rrpy
 ```
 
-For $\theta_4$, $\theta_5$, and $\theta_6$ following the process outlined in [Euler Angles from a Rotation Matrix](https://classroom.udacity.com/nanodegrees/nd209/parts/c199593e-1e9a-4830-8e29-2c86f70f489e/modules/8855de3f-2897-46c3-a805-628b5ecf045b/lessons/87c52cd9-09ba-4414-bc30-24ae18277d24/concepts/a124f98b-1ed5-45f5-b8eb-6c40958c1a6b)
+For $\theta_4$, $\theta_5$, and $\theta_6$ following the process outlined in [Euler Angles from a Rotation Matrix](https://classroom.udacity.com/nanodegrees/nd209/parts/c199593e-1e9a-4830-8e29-2c86f70f489e/modules/8855de3f-2897-46c3-a805-628b5ecf045b/lessons/87c52cd9-09ba-4414-bc30-24ae18277d24/concepts/a124f98b-1ed5-45f5-b8eb-6c40958c1a6b)   
 
+
+Consider the extrinsic X-Y-Z rotation sequence and resulting composite rotation matrix:
+
+$$
+R_Z(\alpha) = Roll(\alpha) = 
+\left[
+\begin{matrix}
+        1 & 0 & 0 \\
+        0 & cos\alpha & -sin\alpha \\
+        0 & sin\alpha & cos\alpha \\
+\end{matrix}
+\right]
+
+\\
+R_Y(\beta) = Pitch(\beta) = 
+\left[
+\begin{matrix}
+        cos\beta & 0 & sin\beta \\
+        0 & 1 & 0 \\
+        -sin\beta & 0 & cos\beta \\
+\end{matrix}
+\right]
+
+\\
+
+R_X(\gamma) = Yaw(\gamma) = 
+\left[
+\begin{matrix}
+        cos\gamma & -sin\gamma & 0\\
+        sin\gamma & cos\gamma & 0 \\
+        0 & 0 & 1 \\
+\end{matrix}
+\right]
+$$  
+
+$$
+{}^A_B{R}_{XYZ} = R_Z(\alpha)R_Y(\beta)R_X(\gamma) \\
+
+=
+
+\left[
+\begin{matrix}
+r_{11} & r_{12} & r_{13} \\ 
+r_{21} & r_{22} & r_{23} \\ 
+r_{31} & r_{32} & r_{33} \\ 
+\end{matrix}
+\right]
+
+=
+
+\left[
+\begin{matrix}
+c\alpha c\beta & c\alpha s\beta s\gamma - s\alpha c\gamma & c\alpha s\beta c\gamma + s\alpha s\gamma \\
+s\alpha c\beta & s\alpha s\beta s\gamma + c\alpha c\gamma & s\alpha s\beta c\gamma - c\alpha s\gamma \\
+-s\beta & c\beta s\gamma & c\beta c\gamma \\
+\end{matrix}
+\right]
+
+$$
+
+Solving for angles just using the inverse sine or cosine functions would result in ambiguity, i.e. they cannot distinguish between diametrically opposite directions, e.g. see $r_{31}$: if $-sin(\beta) = 0.5$, it is unclear in which quadrant is the angle.  
+To account for extra solutions, we use `atan2(y,x)` function, which takes into account the signs of both arguments to determine the quadrant of the result, thus getting rid of the ambiguity.
 
 $$
 \beta = atan2(y,x) = atan2(-r_{31}, \sqrt{-r_{11}*r_{11}+r_{21}*r_{21}}) \\
@@ -538,24 +549,54 @@ $$
 \alpha = atan2(r_{21},r_{11}) \\
 $$
 
-The elemental rotations can either occur about the axes of the fixed coordinate system (extrinsic rotations) or about the axes of a rotating coordinate system, which is initially aligned with the fixed one and modifies its orientation after each elemental rotation (intrinsic rotations). According to [Davenport theorem](https://en.wikipedia.org/wiki/Davenport_chained_rotations) a unique decomposition is possible if and only if the second axis is perpendicular to the other two axes. Therefore axes 1 and 3 must be in the plane orthogonal to axis 2. Decompositions in Euler chained rotations and Tait-Bryan chained rotations are particular cases of this. The Tait-Bryan case appears when axes 1 and 3 are perpendicular, and the Euler case appears when they are overlapping. <sup>[source](https://en.wikipedia.org/wiki/Davenport_chained_rotations)</sup>
+When calculating $\theta_4$ and $\theta_6$, we have to adjust their argument signs, based on our choice of solution for $\theta_5$, therefore ensuring consistency among or solutions.
+
+Using sympy we can get our symbolic R3_6:
+
+$$
+{}^3_6R = 
+\left[
+\begin{matrix}
+-s\theta_4 s\theta_6 + c\theta_4 c\theta_5 c\theta6 & -s\theta_4 c\theta_6 - s\theta_6 c\theta_4 c\theta_5 & -s\theta_5 c\theta_4 \\
+s\theta_5 c\theta_6 & -s\theta_5 s\theta_6 & c\theta_5 \\
+-s\theta_4 c\theta_5 c\theta_6 - s\theta_6 c\theta_4 & s\theta_4 s\theta_6 c\theta_5 - c\theta_4 c\theta_6 & s\theta_4 s\theta_5 \\
+\end{matrix}
+\right]
+$$
+
+```
+theta5 = atan2(sqrt(R3_6[0,2]*R3_6[0,2]+R3_6[2,2]*R3_6[2,2]), R3_6[1,2])
+```
+where 
+
+`R3_6[1,2]` = $c\theta_5$  
+`sqrt(R3_6[0,2]^2+R3_6[2,2]^2)` = $s\theta_5$
 
 
-There are two drawbacks to consider when working with Euler angles and rotation matrices:
-- Rotation matrices are not very numerically stable, beware of *numerical drift*, where over time the matrix may be no longer valid.
-- Singularities of representation - when the second rotation in the sequence is such that the first and third coordinate frames become aligned, causing a loss of a degree of freedom, known as "Gimbal lock".
-
-    KR210 being a manipulator with a spherical wrist, its last three revolute joints intersect at a common point 
-    This simplifies the analysis
-
-
-We also have to consider the workspace of the manipulator - a set of positions that can be reached by its end-effector. Outside this workspace there exists no kinematic solutions to our configuration problem.
+$s\theta_5$ can have a positive and a negative solution. If we assume positive $s\theta_5$
 
 ```
 theta4 = atan2(R3_6[2,2] -R3_6[0,2])
-theta5 = atan2(sqrt(R3_6[0,2]*R3_6[0,2]+R3_6[2,2]*R3_6[2,2]),R3_6[1,2])
 theta6 = atan2(-R3_6[1,1], R3_6[1,0])
 ```
+where 
+
+`R3_6[2,2]` = $s\theta_4 s\theta_5$  
+`R3_6[0,2]` = $-s\theta_5 s\theta_4$
+
+`R3_6[1,1]` = $-s\theta_5 s\theta_6$  
+`R3_6[1,0]` = $s\theta_5 c\theta_6$
+
+
+In opposite case,i.e. $s\theta_5$ being negative, we would have to adjust the solutions for $\theta_4$ and $\theta_6$ accordingly:
+
+```
+theta4 = atan2(-R3_6[2,2] R3_6[0,2])
+theta6 = atan2(R3_6[1,1], -R3_6[1,0])
+```
+
+One could alternatively set up a conditional for when to choose between the solutions.
+
 ---
 
 ## **Project Implementation**
