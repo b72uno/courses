@@ -52,10 +52,23 @@ def pcl_callback(pcl_msg):
 # Exercise-2 TODOs:
 
     # TODO: Convert ROS msg to PCL data
-    
+    pcl_data = ros_to_pcl(pcl_msg)
+
     # TODO: Statistical Outlier Filtering
+    outlier_filter = pcl_data.make_statistical_outlier_filter()
+    outlier_filter.set_mean_k(50) # neighboring points
+    x = 1.0 # threshold scale factor
+    outlier_filter.set_std_dev_mul_thresh(x)
+    cloud_filtered = outlier_filter.filter()
+
 
     # TODO: Voxel Grid Downsampling
+    vox = cloud_filtered.make_voxel_grid_filter()
+    leaf_size = 0.01
+    vox.set_leaf_size(leaf_size, leaf_size, leaf_size)
+    cloud_filtered = vox.filter()
+
+    ros_cluster_cloud = pcl_to_ros(cloud_filtered)
 
     # TODO: PassThrough Filter
 
@@ -86,6 +99,9 @@ def pcl_callback(pcl_msg):
         # Add the detected object to the list of detected objects.
 
     # Publish the list of detected objects
+    #pcl_objects.publish(ros_objects_cloud)
+    #pcl_table_pub.publish(ros_table_cloud)
+    pcl_cluster_pub.publish(ros_cluster_cloud)
 
     # Suggested location for where to invoke your pr2_mover() function within pcl_callback()
     # Could add some logic to determine whether or not your object detections are robust
@@ -137,14 +153,28 @@ def pr2_mover(object_list):
 if __name__ == '__main__':
 
     # TODO: ROS node initialization
+    rospy.init_node('clustering', anonymous=True)
 
     # TODO: Create Subscribers
+    pcl_sub = rospy.Subscriber("/pr2/world/points", pc2.PointCloud2, pcl_callback, queue_size=1)
 
     # TODO: Create Publishers
+    pcl_objects_pub = rospy.Publisher("/pcl_objects", PointCloud2, queue_size=1)
+    pcl_table_pub = rospy.Publisher("/pcl_table", PointCloud2, queue_size=1)
+    pcl_cluster_pub = rospy.Publisher("/pcl_cluster", PointCloud2, queue_size=1)
+    object_markers_pub = rospy.Publisher("/object_markers", Marker, queue_size=1)
+    detected_objects_pub = rospy.Publisher("/detected_objects", PointCloud2, queue_size=1)
 
     # TODO: Load Model From disk
+    model = pickle.load(open('model.sav', 'rb'))
+    clf = model['classifier']
+    encoder = LabelEncoder()
+    encoder.classes_ = model['classes']
+    scaler = model['scaler']
 
     # Initialize color_list
     get_color_list.color_list = []
 
     # TODO: Spin while node is not shutdown
+    while not ros.is_shutdown():
+        rospy.spin()
