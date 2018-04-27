@@ -3,6 +3,8 @@
 # import PCL module
 import pcl
 
+from pcl_helper import *
+
 filename = 'robo_2.pcd'
 cloud = pcl.load_XYZRGB(filename)
 
@@ -22,7 +24,7 @@ cloud_filtered = fil.filter()
 vox = cloud_filtered.make_voxel_grid_filter()
 
 # downsample point cloud
-LEAF_SIZE = 0.01
+LEAF_SIZE = 0.0025
 vox.set_leaf_size(LEAF_SIZE, LEAF_SIZE, LEAF_SIZE)
 cloud_filtered = vox.filter()
 # pcl.save(cloud_filtered, "voxel_downsampled.pcd")
@@ -47,12 +49,37 @@ max_distance = 0.01
 seg.set_distance_threshold(max_distance)
 inliers, coefficients = seg.segment()
 
-extracted_inliers = cloud_filtered.extract(inliers, negative=False)
-pcl.save(extracted_inliers, 'extracted_inliers.pcd')
-
+# extracted_inliers = cloud_filtered.extract(inliers, negative=False)
+# pcl.save(extracted_inliers, 'extracted_inliers.pcd')
 extracted_outliers = cloud_filtered.extract(inliers, negative=True)
-pcl.save(extracted_outliers, 'extracted_outliers.pcd')
+# pcl.save(extracted_outliers, 'extracted_outliers.pcd')
 # [END Segmentation]
+
+# [START Clustering]
+white_cloud = XYZRGB_to_XYZ(extracted_outliers)
+tree = white_cloud.make_kdtree()
+ec = white_cloud.make_EuclideanClusterExtraction()
+ec.set_ClusterTolerance(0.05)
+ec.set_MinClusterSize(10)
+ec.set_MaxClusterSize(3000)
+ec.set_SearchMethod(tree) # search the k-d tree for clusters
+cluster_indices = ec.Extract()
+
+cluster_color = get_color_list(len(cluster_indices))
+color_cluster_point_list = []
+for j, indices in enumerate(cluster_indices):
+    for i, indice in enumerate(indices):
+        color_cluster_point_list.append([
+            white_cloud[indice][0],
+            white_cloud[indice][1],
+            white_cloud[indice][2],
+            rgb_to_float(cluster_color[j])
+        ])
+
+cluster_cloud = pcl.PointCloud_PointXYZRGB()
+cluster_cloud.from_list(color_cluster_point_list)
+pcl.save(cluster_cloud, 'cluster_cloud.pcd')
+# [END Clustering]
 
 
 
