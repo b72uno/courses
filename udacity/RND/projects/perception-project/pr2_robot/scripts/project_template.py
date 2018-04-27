@@ -53,6 +53,8 @@ def pcl_callback(pcl_msg):
 
     # TODO: Convert ROS msg to PCL data
     pcl_data = ros_to_pcl(pcl_msg)
+    pcl.save(pcl_data, 'robot_vision.pcd')
+    print("SAVED!")
 
     # TODO: Statistical Outlier Filtering
     outlier_filter = pcl_data.make_statistical_outlier_filter()
@@ -107,7 +109,8 @@ def pcl_callback(pcl_msg):
     # Could add some logic to determine whether or not your object detections are robust
     # before calling pr2_mover()
     try:
-        pr2_mover(detected_objects_list)
+        #pr2_mover(detected_objects_list)
+	pass
     except rospy.ROSInterruptException:
         pass
 
@@ -166,15 +169,15 @@ if __name__ == '__main__':
     detected_objects_pub = rospy.Publisher("/detected_objects", PointCloud2, queue_size=1)
 
     # TODO: Load Model From disk
-    model = pickle.load(open('model.sav', 'rb'))
-    clf = model['classifier']
-    encoder = LabelEncoder()
-    encoder.classes_ = model['classes']
-    scaler = model['scaler']
+    #model = pickle.load(open('model.sav', 'rb'))
+    #clf = model['classifier']
+    #encoder = LabelEncoder()
+    #encoder.classes_ = model['classes']
+    #scaler = model['scaler']
 
     # Initialize color_list
     get_color_list.color_list = []
 
     # TODO: Spin while node is not shutdown
-    while not ros.is_shutdown():
+    while not rospy.is_shutdown():
         rospy.spin()
