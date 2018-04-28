@@ -42,8 +42,8 @@ cloud_filtered = passthrough.filter()
 passthrough = cloud_filtered.make_passthrough_filter()
 filter_axis = 'y'
 passthrough.set_filter_field_name(filter_axis)
-axis_min = -0.45 
-axis_max = 0.45 
+axis_min = -0.45
+axis_max = 0.45
 passthrough.set_filter_limits(axis_min, axis_max)
 cloud_filtered = passthrough.filter()
 
