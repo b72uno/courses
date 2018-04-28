@@ -62,8 +62,6 @@ encoder = LabelEncoder()
 y_train = encoder.fit_transform(y_train)
 
 # Create classifier
-#clf = svm.SVC(kernel='linear')
-#clf = svm.NuSVC()
 clf = svm.LinearSVC()
 
 # Set up 5-fold cross-validation

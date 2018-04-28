@@ -50,7 +50,6 @@ def send_to_yaml(yaml_filename, dict_list):
 def pcl_callback(pcl_msg):
 
 # Exercise-2 TODOs:
-
     # TODO: Convert ROS msg to PCL data
     pcl_data = ros_to_pcl(pcl_msg)
     #pcl.save(pcl_data, 'robot_vision.pcd')
@@ -64,7 +63,7 @@ def pcl_callback(pcl_msg):
 
     # TODO: Voxel Grid Downsampling
     vox = cloud_filtered.make_voxel_grid_filter()
-    leaf_size = 0.0025
+    leaf_size = 0.003
     vox.set_leaf_size(leaf_size, leaf_size, leaf_size)
     cloud_filtered = vox.filter()
     ros_cluster_cloud = pcl_to_ros(cloud_filtered)
@@ -104,14 +103,14 @@ def pcl_callback(pcl_msg):
     white_cloud = XYZRGB_to_XYZ(extracted_outliers)
     tree = white_cloud.make_kdtree()
     ec = white_cloud.make_EuclideanClusterExtraction()
-    ec.set_ClusterTolerance(0.025)
+    ec.set_ClusterTolerance(0.03)
     ec.set_MinClusterSize(100)
     ec.set_MaxClusterSize(10000)
     ec.set_SearchMethod(tree) # search the k-d tree for clusters
     cluster_indices = ec.Extract()
 
     # TODO: Create Cluster-Mask Point Cloud to visualize each cluster separately
-    get_color_list.color_list = []
+    #get_color_list.color_list = []
     cluster_color = get_color_list(len(cluster_indices))
     color_cluster_point_list = []
     for j, indices in enumerate(cluster_indices):
@@ -150,33 +149,33 @@ def pcl_callback(pcl_msg):
         ros_object_cluster = pcl_to_ros(pcl_cluster)
 
         # Compute the associated feature vector
-        chists = compute_normal_histograms(ros_object_cluster, using_hsv=True)
+        chists = compute_color_histograms(ros_object_cluster, using_hsv=True)
         normals = get_normals(ros_object_cluster)
         nhists = compute_normal_histograms(normals)
-        feature = np.concatenate((chist, nhists))
+        feature = np.concatenate((chists, nhists))
 
         # Make the prediction
-        prediction = clf.predit(scaler.transform(feature.reshape(1, -1)))
+        prediction = clf.predict(scaler.transform(feature.reshape(1, -1)))
         label = encoder.inverse_transform(prediction)[0]
         detected_objects_labels.append(label)
 
         # Publish a label into RViz
         label_pos = list(white_cloud[pts_list[0]])
-        label_post[2] += .4
+        label_pos[2] += .4
         object_markers_pub.publish(make_label(label, label_pos, index))
 
         # Add the detected object to the list of detected objects.
         do = DetectedObject()
         do.label = label
-        do.cloud = ros_cluster_cloud
+        #do.cloud = ros_object_cluster
         detected_objects.append(do)
 
     rospy.loginfo('Detected {} objects: {}'.format(len(detected_objects_labels), detected_objects_labels))
     # Publish the list of detected objects
-    pcl_objects.publish(ros_object_cloud)
+    pcl_objects_pub.publish(ros_object_cloud)
     pcl_table_pub.publish(ros_table_cloud)
     pcl_cluster_pub.publish(ros_cluster_cloud)
-    detected_objects.publish(detected_objects)
+    detected_objects_pub.publish(detected_objects)
 
     # Suggested location for where to invoke your pr2_mover() function within pcl_callback()
     # Could add some logic to determine whether or not your object detections are robust
@@ -242,11 +241,11 @@ if __name__ == '__main__':
     detected_objects_pub = rospy.Publisher("/detected_objects", PointCloud2, queue_size=1)
 
     # TODO: Load Model From disk
-    #model = pickle.load(open('model.sav', 'rb'))
-    #clf = model['classifier']
-    #encoder = LabelEncoder()
-    #encoder.classes_ = model['classes']
-    #scaler = model['scaler']
+    model = pickle.load(open('model.sav', 'rb'))
+    clf = model['classifier']
+    encoder = LabelEncoder()
+    encoder.classes_ = model['classes']
+    scaler = model['scaler']
 
     # Initialize color_list
     get_color_list.color_list = []
