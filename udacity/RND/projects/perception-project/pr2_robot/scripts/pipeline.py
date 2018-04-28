@@ -5,7 +5,7 @@ import pcl
 
 from pcl_helper import *
 
-filename = 'robo_2.pcd'
+filename = 'robo_3.pcd'
 cloud = pcl.load_XYZRGB(filename)
 
 # [START Statistical outlier filter]
@@ -36,9 +36,18 @@ passthrough.set_filter_field_name(filter_axis)
 axis_min = 0.6
 axis_max = 1.1
 passthrough.set_filter_limits(axis_min, axis_max)
-
 cloud_filtered = passthrough.filter()
-# pcl.save(cloud_filtered, "pass_through_filtered.pcd")
+
+# lets get rid of those boxes
+passthrough = cloud_filtered.make_passthrough_filter()
+filter_axis = 'y'
+passthrough.set_filter_field_name(filter_axis)
+axis_min = -0.45 
+axis_max = 0.45 
+passthrough.set_filter_limits(axis_min, axis_max)
+cloud_filtered = passthrough.filter()
+
+#pcl.save(cloud_filtered, "pass_through_filtered.pcd")
 # [END Plane fitting]
 
 # [START Segmentation]
@@ -59,12 +68,13 @@ extracted_outliers = cloud_filtered.extract(inliers, negative=True)
 white_cloud = XYZRGB_to_XYZ(extracted_outliers)
 tree = white_cloud.make_kdtree()
 ec = white_cloud.make_EuclideanClusterExtraction()
-ec.set_ClusterTolerance(0.05)
-ec.set_MinClusterSize(10)
-ec.set_MaxClusterSize(3000)
+ec.set_ClusterTolerance(0.025)
+ec.set_MinClusterSize(100)
+ec.set_MaxClusterSize(10000)
 ec.set_SearchMethod(tree) # search the k-d tree for clusters
 cluster_indices = ec.Extract()
 
+get_color_list.color_list = []
 cluster_color = get_color_list(len(cluster_indices))
 color_cluster_point_list = []
 for j, indices in enumerate(cluster_indices):
@@ -82,4 +92,6 @@ pcl.save(cluster_cloud, 'cluster_cloud.pcd')
 # [END Clustering]
 
 
+if __name__ == '__main__':
 
+    get_color_list.color_list = []
