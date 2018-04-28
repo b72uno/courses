@@ -144,11 +144,11 @@ def pcl_callback(pcl_msg):
     for index, pts_list in enumerate(cluster_indices):
         # Grab the points for the cluster
         pcl_cluster = cloud_objects.extract(pts_list)
-        ros_object_cluster = pcl_to_ros(pcl_cluster)
+        ros_cluster = pcl_to_ros(pcl_cluster)
 
         # Compute the associated feature vector
-        chists = compute_color_histograms(ros_object_cluster, using_hsv=True)
-        normals = get_normals(ros_object_cluster)
+        chists = compute_color_histograms(ros_cluster, using_hsv=True)
+        normals = get_normals(ros_cluster)
         nhists = compute_normal_histograms(normals)
         feature = np.concatenate((chists, nhists))
 
@@ -165,10 +165,11 @@ def pcl_callback(pcl_msg):
         # Add the detected object to the list of detected objects.
         do = DetectedObject()
         do.label = label
-        do.cloud = ros_object_cluster
+        do.cloud = ros_cluster
         detected_objects.append(do)
 
     rospy.loginfo('Detected {} objects: {}'.format(len(detected_objects_labels), detected_objects_labels))
+
     # Publish the list of detected objects
     pcl_objects_pub.publish(ros_object_cloud)
     pcl_table_pub.publish(ros_table_cloud)
@@ -187,16 +188,16 @@ def pcl_callback(pcl_msg):
 def pr2_mover(object_list):
 
     # TODO: Initialize variables
-    test_scene_num = Int32()
+    test_scene = Int32()
     object_name = String()
     arm_name = String()
     pick_pose = Pose()
     place_pose = Pose()
 
-    # get scene number
-    scene_num = rospy.get_param('world_name')
-    print(scene_num)
-    test_scene_num.data = 0
+    # Should be changed depending on the pick_list value in launch file
+    # /pr2_robot/launch/pick_place_project.launch
+    scene_num = "2"
+    test_scene.data = scene_num 
 
     # TODO: Get/Read parameters
     object_list_param = rospy.get_param('/object_list')
@@ -206,7 +207,7 @@ def pr2_mover(object_list):
     for box in dropbox:
         dropbox_groups[box['group']] = {"name": box['name'],
                                         "pose": box['position']}
-    yaml_dicts = {}
+    yaml_dicts = []
 
     for i in range(len(object_list_param)):
         # TODO: Parse parameters into individual variables
@@ -216,28 +217,30 @@ def pr2_mover(object_list):
         # TODO: Rotate PR2 in place to capture side tables for the collision map
 
         # TODO: Loop through the pick list
-        for obj in detected_objects:
+        for obj in object_list:
             if name == str(obj.label):
 
                 object_name.data = name
 
                 # TODO: Get the PointCloud for a given object and obtain it's centroid
                 points_arr = ros_to_pcl(obj.cloud).to_array()
-                pick_pose.position.x,\
-                pick_pose.position.y,\
-                pick_pose.position z = np.asscalar(np.mean(points, axis=0)[:3])
+		x,y,z = np.mean(points_arr, axis=0)[:3]
+                pick_pose.position.x = np.asscalar(x)
+                pick_pose.position.y = np.asscalar(y)
+                pick_pose.position.z = np.asscalar(z)
 
                 # TODO: Create 'place_pose' for the object
-                place_pose.position.x,\
-                place_pose.position.y,\
-                place_pose.position.z = np.float(dropbox_groups[group].pose)
+		x,y,z = dropbox_groups[group]["pose"]
+                place_pose.position.x = np.float(x)
+                place_pose.position.y = np.float(y)
+                place_pose.position.z = np.float(z)
 
                 # TODO: Assign the arm to be used for pick_place
-                arm_name.data = dropbox_groups[group].name
+                arm_name.data = dropbox_groups[group]["name"]
 
                 # TODO: Create a list of dictionaries (made with make_yaml_dict()) for later output to yaml format
                 # make_yaml_dict(test_scene_num, arm_name, object_name, pick_pose, place_pose)
-                yaml_dicts.append(make_yaml_dict(test_scene, arm_name, object_name, pick_pose, place_pose)
+                yaml_dicts.append(make_yaml_dict(test_scene, arm_name, object_name, pick_pose, place_pose))
 
         # Wait for 'pick_place_routine' service to come up
         # rospy.wait_for_service('pick_place_routine')
@@ -255,8 +258,10 @@ def pr2_mover(object_list):
 
     # TODO: Output your request parameters into output yaml file
     # send_to_yaml(yaml_filename, dict_list)
-    filename = "world-" + scene_num + "-output.yaml"
+    #filename = "world-" + scene_num + "-output.yaml"
+    filename = "output_" + scene_num + ".yaml"
     send_to_yaml(filename, yaml_dicts)
+    print("Finished")
 
 
 
@@ -273,7 +278,7 @@ if __name__ == '__main__':
     pcl_table_pub = rospy.Publisher("/pcl_table", PointCloud2, queue_size=1)
     pcl_cluster_pub = rospy.Publisher("/pcl_cluster", PointCloud2, queue_size=1)
     object_markers_pub = rospy.Publisher("/object_markers", Marker, queue_size=1)
-    detected_objects_pub = rospy.Publisher("/detected_objects", DetectedObject, queue_size=1)
+    detected_objects_pub = rospy.Publisher("/detected_objects", DetectedObjectsArray, queue_size=1)
 
     # TODO: Load Model From disk
     model = pickle.load(open('model.sav', 'rb'))
