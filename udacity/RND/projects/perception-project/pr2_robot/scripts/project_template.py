@@ -179,8 +179,7 @@ def pcl_callback(pcl_msg):
     # Could add some logic to determine whether or not your object detections are robust
     # before calling pr2_mover()
     try:
-        #pr2_mover(detected_objects_list)
-	pass
+        pr2_mover(detected_objects)
     except rospy.ROSInterruptException:
         pass
 
@@ -188,38 +187,76 @@ def pcl_callback(pcl_msg):
 def pr2_mover(object_list):
 
     # TODO: Initialize variables
+    test_scene_num = Int32()
+    object_name = String()
+    arm_name = String()
+    pick_pose = Pose()
+    place_pose = Pose()
+
+    # get scene number
+    scene_num = rospy.get_param('world_name')
+    print(scene_num)
+    test_scene_num.data = 0
 
     # TODO: Get/Read parameters
+    object_list_param = rospy.get_param('/object_list')
 
-    # TODO: Parse parameters into individual variables
+    dropbox = rospy.get_param('/dropbox')
+    dropbox_groups = {}
+    for box in dropbox:
+        dropbox_groups[box['group']] = {"name": box['name'],
+                                        "pose": box['position']}
+    yaml_dicts = {}
 
-    # TODO: Rotate PR2 in place to capture side tables for the collision map
+    for i in range(len(object_list_param)):
+        # TODO: Parse parameters into individual variables
+        name = object_list_param[i]['name']
+        group = object_list_param[i]['group']
 
-    # TODO: Loop through the pick list
+        # TODO: Rotate PR2 in place to capture side tables for the collision map
 
-        # TODO: Get the PointCloud for a given object and obtain it's centroid
+        # TODO: Loop through the pick list
+        for obj in detected_objects:
+            if name == str(obj.label):
 
-        # TODO: Create 'place_pose' for the object
+                object_name.data = name
 
-        # TODO: Assign the arm to be used for pick_place
+                # TODO: Get the PointCloud for a given object and obtain it's centroid
+                points_arr = ros_to_pcl(obj.cloud).to_array()
+                pick_pose.position.x,\
+                pick_pose.position.y,\
+                pick_pose.position z = np.asscalar(np.mean(points, axis=0)[:3])
 
-        # TODO: Create a list of dictionaries (made with make_yaml_dict()) for later output to yaml format
+                # TODO: Create 'place_pose' for the object
+                place_pose.position.x,\
+                place_pose.position.y,\
+                place_pose.position.z = np.float(dropbox_groups[group].pose)
+
+                # TODO: Assign the arm to be used for pick_place
+                arm_name.data = dropbox_groups[group].name
+
+                # TODO: Create a list of dictionaries (made with make_yaml_dict()) for later output to yaml format
+                # make_yaml_dict(test_scene_num, arm_name, object_name, pick_pose, place_pose)
+                yaml_dicts.append(make_yaml_dict(test_scene, arm_name, object_name, pick_pose, place_pose)
 
         # Wait for 'pick_place_routine' service to come up
-        rospy.wait_for_service('pick_place_routine')
+        # rospy.wait_for_service('pick_place_routine')
 
-        try:
-            pick_place_routine = rospy.ServiceProxy('pick_place_routine', PickPlace)
+        # try:
+        #     pick_place_routine = rospy.ServiceProxy('pick_place_routine', PickPlace)
 
-            # TODO: Insert your message variables to be sent as a service request
-            resp = pick_place_routine(TEST_SCENE_NUM, OBJECT_NAME, WHICH_ARM, PICK_POSE, PLACE_POSE)
+        #     # TODO: Insert your message variables to be sent as a service request
+        #     resp = pick_place_routine(TEST_SCENE_NUM, OBJECT_NAME, WHICH_ARM, PICK_POSE, PLACE_POSE)
 
-            print ("Response: ",resp.success)
+        #     print ("Response: ",resp.success)
 
-        except rospy.ServiceException, e:
-            print "Service call failed: %s"%e
+        # except rospy.ServiceException, e:
+        #     print "Service call failed: %s"%e
 
     # TODO: Output your request parameters into output yaml file
+    # send_to_yaml(yaml_filename, dict_list)
+    filename = "world-" + scene_num + "-output.yaml"
+    send_to_yaml(filename, yaml_dicts)
 
 
 
@@ -236,7 +273,7 @@ if __name__ == '__main__':
     pcl_table_pub = rospy.Publisher("/pcl_table", PointCloud2, queue_size=1)
     pcl_cluster_pub = rospy.Publisher("/pcl_cluster", PointCloud2, queue_size=1)
     object_markers_pub = rospy.Publisher("/object_markers", Marker, queue_size=1)
-    detected_objects_pub = rospy.Publisher("/detected_objects", PointCloud2, queue_size=1)
+    detected_objects_pub = rospy.Publisher("/detected_objects", DetectedObject, queue_size=1)
 
     # TODO: Load Model From disk
     model = pickle.load(open('model.sav', 'rb'))
