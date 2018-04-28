@@ -66,7 +66,6 @@ def pcl_callback(pcl_msg):
     leaf_size = 0.003
     vox.set_leaf_size(leaf_size, leaf_size, leaf_size)
     cloud_filtered = vox.filter()
-    ros_cluster_cloud = pcl_to_ros(cloud_filtered)
 
     # TODO: PassThrough Filter
     passthrough = cloud_filtered.make_passthrough_filter()
@@ -93,7 +92,6 @@ def pcl_callback(pcl_msg):
     max_distance = 0.01
     seg.set_distance_threshold(max_distance)
     inliers, coefficients = seg.segment()
-
 
     # TODO: Extract inliers and outliers
     extracted_inliers = cloud_filtered.extract(inliers, negative=False)
@@ -167,7 +165,7 @@ def pcl_callback(pcl_msg):
         # Add the detected object to the list of detected objects.
         do = DetectedObject()
         do.label = label
-        #do.cloud = ros_object_cluster
+        do.cloud = ros_object_cluster
         detected_objects.append(do)
 
     rospy.loginfo('Detected {} objects: {}'.format(len(detected_objects_labels), detected_objects_labels))

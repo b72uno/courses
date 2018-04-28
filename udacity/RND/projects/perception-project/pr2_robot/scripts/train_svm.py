@@ -63,6 +63,7 @@ y_train = encoder.fit_transform(y_train)
 
 # Create classifier
 clf = svm.LinearSVC()
+#clf = svm.NuSVC(kernel='linear')
 
 # Set up 5-fold cross-validation
 kf = cross_validation.KFold(len(X_train),
