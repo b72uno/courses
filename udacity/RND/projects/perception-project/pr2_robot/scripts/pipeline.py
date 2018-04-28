@@ -24,8 +24,8 @@ cloud_filtered = fil.filter()
 vox = cloud_filtered.make_voxel_grid_filter()
 
 # downsample point cloud
-LEAF_SIZE = 0.0025
-vox.set_leaf_size(LEAF_SIZE, LEAF_SIZE, LEAF_SIZE)
+leaf_size = 0.0025
+vox.set_leaf_size(leaf_size, leaf_size, leaf_size)
 cloud_filtered = vox.filter()
 # pcl.save(cloud_filtered, "voxel_downsampled.pcd")
 
@@ -58,7 +58,7 @@ max_distance = 0.01
 seg.set_distance_threshold(max_distance)
 inliers, coefficients = seg.segment()
 
-# extracted_inliers = cloud_filtered.extract(inliers, negative=False)
+extracted_inliers = cloud_filtered.extract(inliers, negative=False)
 # pcl.save(extracted_inliers, 'extracted_inliers.pcd')
 extracted_outliers = cloud_filtered.extract(inliers, negative=True)
 # pcl.save(extracted_outliers, 'extracted_outliers.pcd')

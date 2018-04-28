@@ -53,57 +53,130 @@ def pcl_callback(pcl_msg):
 
     # TODO: Convert ROS msg to PCL data
     pcl_data = ros_to_pcl(pcl_msg)
-    pcl.save(pcl_data, 'robot_vision.pcd')
-    print("SAVED!")
+    #pcl.save(pcl_data, 'robot_vision.pcd')
 
     # TODO: Statistical Outlier Filtering
-    outlier_filter = pcl_data.make_statistical_outlier_filter()
-    outlier_filter.set_mean_k(50) # neighboring points
-    x = 1.0 # threshold scale factor
-    outlier_filter.set_std_dev_mul_thresh(x)
-    cloud_filtered = outlier_filter.filter()
+    fil = pcl_data.make_statistical_outlier_filter()
+    fil.set_mean_k(5)
+    fil.set_std_dev_mul_thresh(1.0)
+    cloud_filtered = fil.filter()
 
 
     # TODO: Voxel Grid Downsampling
     vox = cloud_filtered.make_voxel_grid_filter()
-    leaf_size = 0.01
+    leaf_size = 0.0025
     vox.set_leaf_size(leaf_size, leaf_size, leaf_size)
     cloud_filtered = vox.filter()
-
     ros_cluster_cloud = pcl_to_ros(cloud_filtered)
 
     # TODO: PassThrough Filter
+    passthrough = cloud_filtered.make_passthrough_filter()
+    filter_axis = 'z'
+    passthrough.set_filter_field_name(filter_axis)
+    axis_min = 0.6
+    axis_max = 1.1
+    passthrough.set_filter_limits(axis_min, axis_max)
+    cloud_filtered = passthrough.filter()
+
+    # limit our viewport in y-axis
+    passthrough = cloud_filtered.make_passthrough_filter()
+    filter_axis = 'y'
+    passthrough.set_filter_field_name(filter_axis)
+    axis_min = -0.45
+    axis_max = 0.45
+    passthrough.set_filter_limits(axis_min, axis_max)
+    cloud_filtered = passthrough.filter()
 
     # TODO: RANSAC Plane Segmentation
+    seg = cloud_filtered.make_segmenter()
+    seg.set_model_type(pcl.SACMODEL_PLANE)
+    seg.set_method_type(pcl.SAC_RANSAC)
+    max_distance = 0.01
+    seg.set_distance_threshold(max_distance)
+    inliers, coefficients = seg.segment()
+
 
     # TODO: Extract inliers and outliers
+    extracted_inliers = cloud_filtered.extract(inliers, negative=False)
+    extracted_outliers = cloud_filtered.extract(inliers, negative=True)
 
     # TODO: Euclidean Clustering
+    white_cloud = XYZRGB_to_XYZ(extracted_outliers)
+    tree = white_cloud.make_kdtree()
+    ec = white_cloud.make_EuclideanClusterExtraction()
+    ec.set_ClusterTolerance(0.025)
+    ec.set_MinClusterSize(100)
+    ec.set_MaxClusterSize(10000)
+    ec.set_SearchMethod(tree) # search the k-d tree for clusters
+    cluster_indices = ec.Extract()
 
     # TODO: Create Cluster-Mask Point Cloud to visualize each cluster separately
+    get_color_list.color_list = []
+    cluster_color = get_color_list(len(cluster_indices))
+    color_cluster_point_list = []
+    for j, indices in enumerate(cluster_indices):
+        for i, indice in enumerate(indices):
+            color_cluster_point_list.append([
+                white_cloud[indice][0],
+                white_cloud[indice][1],
+                white_cloud[indice][2],
+                rgb_to_float(cluster_color[j])
+            ])
+
+    cluster_cloud = pcl.PointCloud_PointXYZRGB()
+    cluster_cloud.from_list(color_cluster_point_list)
 
     # TODO: Convert PCL data to ROS messages
+    ros_table_cloud = pcl_to_ros(extracted_inliers)
+    ros_object_cloud = pcl_to_ros(extracted_outliers)
+    ros_cluster_cloud = pcl_to_ros(cluster_cloud)
 
     # TODO: Publish ROS messages
+    pcl_table_pub.publish(ros_table_cloud)
+    pcl_objects_pub.publish(ros_object_cloud)
+    pcl_cluster_pub.publish(ros_cluster_cloud)
 
 # Exercise-3 TODOs:
 
-    # Classify the clusters! (loop through each detected cluster one at a time)
+    detected_objects_labels = []
+    detected_objects = []
 
+    cloud_objects = extracted_outliers
+
+    # Classify the clusters! (loop through each detected cluster one at a time)
+    for index, pts_list in enumerate(cluster_indices):
         # Grab the points for the cluster
+        pcl_cluster = cloud_objects.extract(pts_list)
+        ros_object_cluster = pcl_to_ros(pcl_cluster)
 
         # Compute the associated feature vector
+        chists = compute_normal_histograms(ros_object_cluster, using_hsv=True)
+        normals = get_normals(ros_object_cluster)
+        nhists = compute_normal_histograms(normals)
+        feature = np.concatenate((chist, nhists))
 
         # Make the prediction
+        prediction = clf.predit(scaler.transform(feature.reshape(1, -1)))
+        label = encoder.inverse_transform(prediction)[0]
+        detected_objects_labels.append(label)
 
         # Publish a label into RViz
+        label_pos = list(white_cloud[pts_list[0]])
+        label_post[2] += .4
+        object_markers_pub.publish(make_label(label, label_pos, index))
 
         # Add the detected object to the list of detected objects.
+        do = DetectedObject()
+        do.label = label
+        do.cloud = ros_cluster_cloud
+        detected_objects.append(do)
 
+    rospy.loginfo('Detected {} objects: {}'.format(len(detected_objects_labels), detected_objects_labels))
     # Publish the list of detected objects
-    #pcl_objects.publish(ros_objects_cloud)
-    #pcl_table_pub.publish(ros_table_cloud)
+    pcl_objects.publish(ros_object_cloud)
+    pcl_table_pub.publish(ros_table_cloud)
     pcl_cluster_pub.publish(ros_cluster_cloud)
+    detected_objects.publish(detected_objects)
 
     # Suggested location for where to invoke your pr2_mover() function within pcl_callback()
     # Could add some logic to determine whether or not your object detections are robust

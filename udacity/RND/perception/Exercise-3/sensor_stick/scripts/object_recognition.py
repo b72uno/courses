@@ -118,7 +118,7 @@ def pcl_callback(pcl_msg):
         ros_object_cluster = pcl_to_ros(pcl_cluster)
 
         # Compute the associated feature vector
-        chists = compute_color_histograms(ros_object_cluster, using_hsv=False)
+        chists = compute_color_histograms(ros_object_cluster, using_hsv=True)
         normals = get_normals(ros_object_cluster)
         nhists = compute_normal_histograms(normals)
         feature = np.concatenate((chists, nhists))
