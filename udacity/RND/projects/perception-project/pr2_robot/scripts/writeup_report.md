@@ -21,7 +21,7 @@ Applied the snippet from Lesson 17:
 # [START Statistical outlier filter]
 fil = pcl_data.make_statistical_outlier_filter()
 fil.set_mean_k(5)
-fil.set_std_dev_mul_thresh(1.0)
+fil.set_std_dev_mul_thresh(0.5)
 
 cloud_filtered = fil.filter()
 # [END Statistical outlier filter]
@@ -40,7 +40,7 @@ Some noise obviously was removed, but some still remains.
 vox = cloud_filtered.make_voxel_grid_filter()
 
 # downsample point cloud
-leaf_size = 0.003
+leaf_size = 0.0028
 vox.set_leaf_size(leaf_size, leaf_size, leaf_size)
 cloud_filtered = vox.filter()
 ```
@@ -93,7 +93,7 @@ extracted_outliers = cloud_filtered.extract(inliers, negative=True)
 ```
 ![segmented](./misc/segmented.png)
 
-Clustering. Guess what, just like in the exercise. The only difference was to adjust the clustering parameters , to account for the small `leaf_size`, and not to exclude any objects.
+Clustering. The only difference from the exercise was to adjust the clustering parameters , to account for the small `leaf_size`, and not to exclude any objects.
 
 ```
 # [START Clustering]
@@ -136,11 +136,14 @@ cluster_cloud.from_list(color_cluster_point_list)
 
 The implementation process was the same as in the exercise. Besides making sure to use HSV instead of RGB. `chists = compute_color_histograms(ros_cluster, using_hsv=True)` , the key differences / parameters that seemingly worked for all three datasets:
 
-- 75 samples per item `for i in range(75):`
-- bin size of 32 `bins = 32` for both colors and normals
+- 75 samples per item 
+- bin size of 128 for colors
+- bin size of 32 for normals
 - LinearSVC classifier `clf = svm.LinearSVC()`
 
-The accuracy on average was above 0.90, seemed satisfactory.
+An increase in bin size for colors vs normals seemed to prioritize one over another for the recognition process, but this is just a "feeling", one would have to actually explore this further to see if the correlation is there.
+
+The accuracy on average was around 0.90, deemed satisfactory.
 ![histograms](./misc/histograms.png)
 <sub> Sidenote - took me a couple hours to figure out a problem after having high accuracy in confusion matrices, yet in RVIZ the results were way off, classifying half of the items as biscuits. Turns out I was extracting the features with `catkin_ws/src/sensor_stick` code, which was still using RGB, all the time thinking I had symlinked the corrected project files... </sub>
 
