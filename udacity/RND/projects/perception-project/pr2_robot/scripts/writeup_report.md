@@ -141,7 +141,7 @@ The implementation process was the same as in the exercise. Besides making sure 
 - bin size of 32 for normals
 - LinearSVC classifier `clf = svm.LinearSVC()`
 
-An increase in bin size for colors vs normals seemed to prioritize one over another for the recognition process, but this is just a "feeling", one would have to actually explore this further to see if the correlation is there.
+An increase in bin count for colors vs normals seemed to prioritize one over another for the recognition process, but this is just a "feeling", one would have to actually explore this further to see if the correlation is there.
 
 The accuracy on average was around 0.90, deemed satisfactory.
 ![histograms](./misc/histograms.png)
