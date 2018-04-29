@@ -57,13 +57,13 @@ def pcl_callback(pcl_msg):
     # TODO: Statistical Outlier Filtering
     fil = pcl_data.make_statistical_outlier_filter()
     fil.set_mean_k(5)
-    fil.set_std_dev_mul_thresh(1.0)
+    fil.set_std_dev_mul_thresh(0.5)
     cloud_filtered = fil.filter()
 
 
     # TODO: Voxel Grid Downsampling
     vox = cloud_filtered.make_voxel_grid_filter()
-    leaf_size = 0.003
+    leaf_size = 0.0028
     vox.set_leaf_size(leaf_size, leaf_size, leaf_size)
     cloud_filtered = vox.filter()
 
@@ -103,7 +103,7 @@ def pcl_callback(pcl_msg):
     ec = white_cloud.make_EuclideanClusterExtraction()
     ec.set_ClusterTolerance(0.03)
     ec.set_MinClusterSize(100)
-    ec.set_MaxClusterSize(10000)
+    ec.set_MaxClusterSize(15000)
     ec.set_SearchMethod(tree) # search the k-d tree for clusters
     cluster_indices = ec.Extract()
 
@@ -196,7 +196,7 @@ def pr2_mover(object_list):
 
     # Should be changed depending on the pick_list value in launch file
     # /pr2_robot/launch/pick_place_project.launch
-    scene_num = "2"
+    scene_num = "1"
     test_scene.data = scene_num 
 
     # TODO: Get/Read parameters
