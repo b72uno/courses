@@ -59,6 +59,12 @@ class PIDController:
         delta_error = error - self.last_error_
         self.last_error_ = error
 
+        # Limit max windup
+        if self.error_sum_ > self.max_windup_:
+            self.error_sum_ = self.max_windup_
+        elif self.error_sum_ < -self.max_windup_:
+            self.error_sum = -self.max_windup_
+
         # Proportional error
         p = self.kp_ * error
 
