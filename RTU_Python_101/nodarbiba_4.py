@@ -12,11 +12,11 @@
 print("\n\n1.uzdevums:")
 print("--------------------------")
 
-virkne = ["FizzBuzz" if i % 5 == 0 and i % 7 == 0 else
+for i in range(1, 101):
+    print("FizzBuzz" if i % 5 == 0 and i % 7 == 0 else
           "Fizz" if i % 5 == 0 else
           "Buzz" if i % 7 == 0 else
-          str(i) for i in range(1,101)]
-print(",".join(virkne))
+          str(i), end=",")
 
 # 2. Eglīte
 # ===========
