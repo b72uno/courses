@@ -14,11 +14,11 @@
 ievads = input("Ievadiet ievadu: ")
 print(ievads)
 
-if "nav" in ievads and "slikts" in ievads:
+if "nav" in ievads and "slikt" in ievads:
     nav_loc = ievads.find("nav")
-    slikts_loc = ievads.find("slikts")
+    slikts_loc = ievads.find("slikt")
     sl = len("slikt")
-    izvads = ievads[:nav_loc] + "ir labs" + ievads[slikts_loc + sl:]
+    izvads = ievads[:nav_loc] + "ir lab" + ievads[slikts_loc + sl:]
 
     print(izvads)
 

@@ -17,4 +17,3 @@ print("".join("*" if i.isalpha() else i for i in teksts))
 burts = input("Ievadiet burtu: ")
 print("".join(i if burts.lower() == i.lower() or
               not i.isalpha() else "*" for i in teksts))
-print("\n")
