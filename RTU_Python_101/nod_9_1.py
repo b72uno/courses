@@ -7,6 +7,7 @@
 # get_min_avg_max([0,10,1,9]) -> (0,5,10)
 # ienākošā sequence var būt tuple vai list ar skaitliskām vērtībām.
 # 1b tiem, kas pieredzējušāki
+
 # Uzrakstiet funkciju get_min_med_max(sequence), kas atgriež tuple ar trīs vērtībām attiecīgi mazāko, medianu un lielāko vērtību no virknes.
 # Median vērtība ir vērtiba, kas sakartotā virknē ir paša vidū. Ja virknes skaits ir pāra tad vidū ir divas vērtības.
 # No vidus vērtībām tad ņem vidējo.
@@ -19,12 +20,33 @@
 
 
 # %%
-def get_min_avg_max(sequence):
-    s = sequence
-    return (min(s), sum(s) / len(s), max(s))
+def get_min_avg_max(s):
+    avg = int(sum(s) / len(s))
+    return (min(s), avg, max(s))
 
 
 print(get_min_avg_max([0, 10, 1, 9]))
 
 
 # %%
+def get_min_med_max(s):
+    ls = len(s)
+
+    mid = ls // 2
+    s = sorted(s)
+
+    if ls % 2 != 0:
+        median = s[mid]
+    else:
+        try:
+            median = ((int(s[mid - 1])) + int(s[mid])) / 2
+        except ValueError:
+            median = s[mid - 1] + s[mid]
+
+    return (min(s), median, max(s))
+
+
+print(get_min_med_max([1, 5, 8, 4, 3]))
+print(get_min_med_max([2, 2, 9, 9, 4, 3]))
+print(get_min_med_max("baaac"))
+print(get_min_med_max("faaacb"))
