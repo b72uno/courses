@@ -62,9 +62,6 @@ ziemelmeita.sing(1).yell()
 
 
 class Rap(Song):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def break_it(self, max_lines, drop="yeah"):
         drop = " " + drop.upper() + " "
         self.lyrics = [drop.join(line.split(" ")) for line in self.lyrics]
