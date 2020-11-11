@@ -1,0 +1,1 @@
+/home/clash/google_appengine:/home/clash/.cargo/bin:/home/clash/anaconda3/condabin:/home/clash/google_appengine:/home/clash/.cargo/bin:/home/clash/.cargo/bin:/home/clash/.local/bin:/home/b72/anaconda2/bin:/home/plast-tech/anaconda2/bin:/home/clash/anaconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
