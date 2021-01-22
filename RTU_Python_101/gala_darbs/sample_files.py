@@ -123,7 +123,7 @@ reward_list = [
     for name in files
 ]
 
-print("Procceed with your challenge.")
+print("You must procceed with your challenge.")
 input("Press Enter to continue...")
 
 
@@ -148,5 +148,7 @@ def success(file):
 
 for file in challenge_list:
     if success(file):
+        print("You must procceed with your reward.")
+        input("Press Enter to continue...")
         for f in reward_list:
             success(f)
