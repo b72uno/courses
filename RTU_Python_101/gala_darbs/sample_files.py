@@ -9,7 +9,8 @@ import requests
 DIR_PATH = os.getcwd()
 POOL_DIR = DIR_PATH + "/pool/"
 SAMPLE_DIR = DIR_PATH + "/samples/"
-SAMPLE_SIZE = int(input("How many samples? "))
+# SAMPLE_SIZE = int(input("How many samples? "))
+SAMPLE_SIZE = 10
 FAIL_DIR = DIR_PATH + '/failure/'
 COMPLETE_DIR = DIR_PATH + '/success/'
 
@@ -33,13 +34,22 @@ print("Drawing {} new files for sample pool...".format(SAMPLE_SIZE))
 sample_list = random.sample(file_list, SAMPLE_SIZE)
 
 for i, file in enumerate(sample_list):
-    # filename, extension = os.path.splitext(file)
+    filename, extension = os.path.splitext(file)
     filename = os.path.basename(file)
     print("File #{} is {}".format(i, filename))
-    target = SAMPLE_DIR + filename
-    os.rename(file, target)
+    # target = SAMPLE_DIR + filename
+    # os.rename(file, target)
 
-print("Collect your files and proceed.")
+ans = input("See anything you like? (int / N)")
+
+if not ans.lower.startswith("n"):
+    pass
+
+print("Picking conditional test...")
+cond = random.choice(file_list)
+
+print("Your conditional test is "")
+print(cond)
 
 sample_list = [
     os.path.join(path, name) for path, subdirs, files in os.walk(SAMPLE_DIR)
